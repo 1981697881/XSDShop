@@ -52,9 +52,9 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          store.dispatch('LogOut').then(() => {
+          //store.dispatch('LogOut').then(() => {
             location.reload() // 为了重新实例化vue-router对象 避免bug
-          })
+          //})
         })
       } else if (data_code === 500) {
         Notification.error({
@@ -95,9 +95,9 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          store.dispatch('LogOut').then(() => {
+          //store.dispatch('LogOut').then(() => {
             location.reload() // 为了重新实例化vue-router对象 避免bug
-          })
+          //})
         })
       } else if (code === 403) {
         router.push({ path: '/401' })
