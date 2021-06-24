@@ -286,7 +286,9 @@ export default {
         { value: '3', label: '秒杀订单' },
         { value: '4', label: '砍价订单' },
         { value: '5', label: '核销订单' },
-        { value: '6', label: '积分订单' }
+        { value: '6', label: '积分订单' },
+        { value: '7', label: '预售订单' },
+        { value: '8', label: '极速达订单' },
       ],
       handleOptions: [
         {value: '', label: '批量操作'},

@@ -251,6 +251,57 @@
           </template>
         </el-table-column>
       </el-table>
+      <div style="margin-top: 20px" v-if="order.pinkName=='[预售订单]'">
+        <svg-icon icon-class="marker" style="color: #606266"></svg-icon>
+        <span class="font-small">配送计划</span>
+      </div>
+      <div style="margin-top: 20px;margin-bottom: 10px" v-if="order.pinkName=='[预售订单]'">
+             <el-button @click="addMaster">添加</el-button>
+      </div>
+      <el-table v-if="order.pinkName=='[预售订单]'" el-table show-summary style="margin-top: 20px;width: 100%" :data="list" border size="mini" :highlight-current-row="true">
+        <el-table-column
+          v-for="(t,i) in columns"
+          :key="i"
+          align="center"
+          :prop="t.name"
+          :label="t.text"
+          v-if="t.default!=undefined?t.default:true"
+          :width="t.width?t.width:''"
+        >
+          <template slot-scope="scope">
+                <span v-if="scope.row.isSet">
+                  <div class="block"  v-if="t.name == 'routeNo'">
+                  <el-date-picker
+                    @change="changeDate($event,sel)"
+                    v-model="sel[t.name]"
+                    type="date"
+                    size="mini"
+                    :picker-options="pickerOptions"
+                    value-format="yyyy-MM-dd"
+                    placeholder="选择日期">
+                  </el-date-picker>
+                </div>
+                   <el-input-number size="mini" v-else-if="t.name == 'orderNo'" placeholder="请输入内容" v-model="sel[t.name]">
+                  </el-input-number>
+                   <span v-else>{{sel[t.name]}}</span>
+                </span>
+            <span v-else>{{scope.row[t.name]}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="100">
+          <template slot-scope="scope">
+                  <span class="el-tag el-tag--info el-tag--mini" style="cursor: pointer;" @click="pwdChange(scope.row,scope.$index,true)">
+                    {{scope.row.isSet?'确定':"修改"}}
+                  </span>
+            <span v-if="!scope.row.isSet" class="el-tag el-tag--danger el-tag--mini" @click="deleteRow(scope.$index,list)" style="cursor: pointer;">
+                    删除
+                  </span>
+            <span v-else class="el-tag  el-tag--mini" style="cursor: pointer;" @click="pwdChange(scope.row,scope.$index,false)">
+                    取消
+                  </span>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-card>
     <el-dialog title="订单跟踪"
                :visible.sync="kuaidiDialogVisible"
@@ -401,9 +452,24 @@ export default {
   components: {eForm, eRefund, editOrder, eRemark},
   data() {
     return {
+      pickerOptions: {
+        disabledDate: time => {
+          let beginDateVal = new Date()
+          beginDateVal = beginDateVal.setDate(beginDateVal.getDate() - 1)
+          beginDateVal = new Date(beginDateVal)
+          return time.getTime() <= beginDateVal;
+        },
+      },
       orderStatus:null,
       isAdd: false,
       id: null,
+      sel: null, // 选中行
+      list: [],
+      columns: [
+        { text: "id", name: "id", default: false },
+        { text: "配送日期", name: "routeNo" },
+        { text: "配送数量", name: "orderNo" },
+      ],
       order: {
 
       },
@@ -520,6 +586,76 @@ export default {
     this.init();
   },
   methods: {
+    changeDate(val, row){
+      this.$set(row, 'routeNo',val)
+    },
+    //读取表格数据
+    readMasterUser() {
+      //根据实际情况，自己改下啊
+      this.list.map(i => {
+        i.isSet = false; //给后台返回数据添加`isSet`标识
+        return i;
+      });
+    },
+    //修改
+    pwdChange(row, index, cg) {
+      //点击修改 判断是否已经保存所有操作
+      for (let i of this.list) {
+        if (i.isSet && i.userId != row.userId) {
+          this.$message.warning("请先保存当前编辑项");
+          return false;
+        }
+      }
+      //是否是取消操作
+      if (!cg) {
+        if (!this.sel.processId) this.list.splice(index, 1);
+        return row.isSet = !row.isSet;
+      }
+      //提交数据
+      if (row.isSet) {
+        const sel = this.sel
+        if((sel.routeNo == null || sel.routeNo === '') || (sel.orderNo == null || sel.orderNo === '')){
+          return this.$message({
+            type: 'error',
+            message: "请输入必填项!"
+          });
+        }else {
+          let data = JSON.parse(JSON.stringify(this.sel));
+          for (let k in data) row[k] = data[k]
+          this.$message({
+            type: 'success',
+            message: "添加成功!"
+          });
+          //然后这边重新读取表格数据
+          this.readMasterUser();
+          row.isSet = false;
+        }
+      } else {
+        this.sel = JSON.parse(JSON.stringify(row));
+        row.isSet = true;
+      }
+    },
+    //删除带确认区 单行删除
+    deleteRow(row, index, rows) {
+      this.result.forEach((item, index2) =>{
+        if(row.processRouteDetailId == item){
+          this.result.splice(index2,1);
+        }
+      })
+      console.log(this.result)
+      console.log(row)
+      rows.splice(index, 1);
+    },
+    //添加
+    addMaster() {
+      for (let i of this.list) {
+        if (i.isSet) return this.$message.warning("请先保存当前编辑项");
+      }
+      this.cIndex += 10
+      let j = {isSet: true, orderNo: this.cIndex, routeNo: '', orderNo: ''};
+      this.list.push(j);
+      this.sel = JSON.parse(JSON.stringify(j));
+    },
     refund(data) {
       this.isAdd = false
       const _this = this.$refs.form2
