@@ -5,6 +5,7 @@
         <el-radio-group v-model="form.type" @change="couponsType">
           <el-radio :label=0>通用券</el-radio>
           <el-radio :label=1>商品券</el-radio>
+          <el-radio :label=2>快递券</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="选择商品" v-if="form.type == 1">
