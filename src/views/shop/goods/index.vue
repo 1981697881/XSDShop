@@ -52,6 +52,8 @@
       <el-table-column label="商品类型" align="center">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.isIntegral === 1" style="cursor: pointer" :type="'warning'">积分商品</el-tag>
+          <el-tag v-else-if="scope.row.isIntegral === 2" style="cursor: pointer" :type="'warning'">预售商品</el-tag>
+          <el-tag v-else-if="scope.row.isIntegral === 3" style="cursor: pointer" :type="'warning'">极速达商品</el-tag>
           <el-tag v-else style="cursor: pointer" :type=" 'info' ">普通商品</el-tag>
         </template>
       </el-table-column>

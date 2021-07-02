@@ -26,6 +26,11 @@
       <el-form-item label="排序">
         <el-input-number v-model="form.sort" style="width: 300px;" />
       </el-form-item>
+      <el-form-item label="使用限制">
+        <el-radio v-model="form.status" :label="0">全员发送</el-radio>
+        <el-radio v-model="form.status" :label="1">新用户注册</el-radio>
+        <el-radio v-model="form.status" :label="2">特定人员</el-radio>
+      </el-form-item>
       <el-form-item label="状态">
         <el-radio v-model="form.status" :label="1">开启</el-radio>
         <el-radio v-model="form.status" :label="0">关闭</el-radio>
