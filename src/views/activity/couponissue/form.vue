@@ -1,10 +1,10 @@
 <template>
   <el-dialog :append-to-body="true" :close-on-click-modal="false" :before-close="cancel" :visible.sync="dialog" :title="isAdd ? '新增' : '发布优惠券'" width="500px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="100px">
-      <el-form-item label="优惠券ID">
-        <el-input v-model="form.cid" style="width: 300px;" :disabled="true" />
+      <!--<el-form-item label="优惠券ID">
+        <el-input v-model="form.cid" style="width: 300px;" />
         <el-input v-model="form.ctype" type="hidden" />
-      </el-form-item>
+      </el-form-item>-->
       <el-form-item label="优惠券名称">
         <el-input v-model="form.cname" style="width: 300px;" :disabled="true" />
       </el-form-item>

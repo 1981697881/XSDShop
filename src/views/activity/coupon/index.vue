@@ -29,6 +29,15 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column prop="type" label="发送限制">
+        <template slot-scope="scope">
+          <div>
+            <el-tag v-if="scope.row.getLimit === 0"  :type="'success'">全员发放</el-tag>
+            <el-tag v-else-if="scope.row.getLimit === 1"  :type="'danger'">新用户</el-tag>
+            <el-tag v-else :type="'info' ">特定人员</el-tag>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="couponPrice" label="优惠券面值" />
       <el-table-column prop="useMinPrice" label="优惠券最低消费" />
       <el-table-column label="优惠券有效期限">
@@ -101,6 +110,33 @@
       @size-change="sizeChange"
       @current-change="pageChange"
     />
+    <el-dialog
+      :visible.sync="visible"
+      title="特定人员优惠券"
+      v-if="visible"
+      :width="'30%'"
+      destroy-on-close
+      append-to-body
+    >
+      <el-form :model="form" :rules="rules" ref="form" label-width="80px" :size="'mini'">
+        <el-row :span="24">
+          <el-form-item :label="'优惠券名称'" prop="starName">
+            <el-input v-model="form.starName"></el-input>
+          </el-form-item>
+        </el-row>
+        <el-row :span="24">
+          <el-col :span="24">
+            <el-form-item :label="'个人简介'" prop="starProfile">
+              <el-input type="textarea" v-model="form.starProfile"></el-input>
+            </el-form-item>
+          </el-col>
+
+        </el-row>
+      </el-form>
+      <div slot="footer" style="text-align:center;padding-top: 15px">
+        <el-button type="primary" @click="saveStart('userform')">保存</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -116,7 +152,24 @@ export default {
   mixins: [initData],
   data() {
     return {
-      delLoading: false
+      delLoading: false,
+      visible: false,
+      form: {
+        starSex: null,
+        starName: null, // 名称
+        starProfile: null,
+        starPhotoUrl: null,
+      },
+      rules: {
+        starName: [
+          {required: true, message: '请输入值', trigger: 'blur'},
+        ],starProfile: [
+          {required: true, message: '请输入值', trigger: 'blur'},
+        ],
+        starSex: [
+          {required: true, message: '请选择', trigger: 'change'}
+        ],
+      },
     }
   },
   created() {
@@ -162,6 +215,7 @@ export default {
         id: data.id,
         title: data.title,
         integral: data.integral,
+        getLimit: data.getLimit,
         couponPrice: data.couponPrice,
         useMinPrice: data.useMinPrice,
         couponTime: data.couponTime,
@@ -174,19 +228,25 @@ export default {
       _this.dialog = true
     },
     edit2(data) {
-      this.isAdd = true
-      const _this = this.$refs.form2
-      _this.form = {
-        cid: data.id,
-        cname: data.title,
-        ctype: data.type,
-        isPermanent: 0,
-        status: 1,
-        totalCount: 0,
-        remainCount: 0,
-        isDel: 0
+      console.log(data)
+      if(data.getLimit==2){
+        this.visible = true
+      }else{
+        this.isAdd = true
+        const _this = this.$refs.form2
+        _this.form = {
+          cid: data.id,
+          cname: data.title,
+          ctype: data.type,
+          getLimit: data.getLimit,
+          isPermanent: 0,
+          status: 1,
+          totalCount: 0,
+          remainCount: 0,
+          isDel: 0
+        }
+        _this.dialog = true
       }
-      _this.dialog = true
     }
   }
 }
