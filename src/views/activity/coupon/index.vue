@@ -139,7 +139,6 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
 import checkPermission from '@/utils/permission'
 import initData from '@/mixins/crud'

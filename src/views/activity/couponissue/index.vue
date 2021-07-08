@@ -24,7 +24,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="cname" label="优惠券名称" />
+      <el-table-column prop="cname" label=" " />
       <el-table-column label="领取日期" prop="startTime">
         <template slot-scope="scope">
           <p>{{ formatTimeTwo(scope.row.startTime) }}</p>
