@@ -6,31 +6,59 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title // 网址标题
-const port = 8013 // 端口配置
+const name = defaultSettings.title || 'XSDShop v.1' // page title
+// If your port is set to 80,
+// use administrator privileges to execute the command line.
+// For example, Mac: sudo npm run
+// You can change the port by the following methods:
+// port = 9528 npm run dev OR npm run dev --port = 9528
 
+// const port = process.env.port || process.env.npm_config_port || 9528 // dev port
+const port = 8013
+// All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
-  publicPath: '/',
-  outputDir: 'dist',
+  /**
+   * You will need to set publicPath if you plan to deploy your site under a sub path,
+   * for example GitHub Pages. If you plan to deploy your site to https://foo.github.io/bar/,
+   * then publicPath should be set to "/bar/".
+   * In most cases please use '/' !!!
+   * Detail: https://cli.vuejs.org/config/#publicpath
+   */
+  publicPath: process.env.NODE_ENV === 'production' ? '/XSDShop/' : '/',
   assetsDir: 'static',
-  lintOnSave: false,
+  lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
     port: port,
-    open: true,
+    open: false,
     overlay: {
       warnings: false,
       errors: true
     },
     proxy: {
-      [process.env.VUE_APP_ENV_URL]: {
-        target: process.env.VUE_APP_BASE_API,
-        changeOrigin: true,
+      // change xxx-api/login => mock/login
+      // detail: https://cli.vuejs.org/config/#devserver-proxy
+      [process.env.VUE_APP_BASE_API]: {
+        target: 'https://gzfzdev.com/gateway', // 修改后台接口地址
+        //target: `http://test.gzfzdev.com:10005/`,
+        changeOrigin: true, // 必须加上跨域
+        ws: false,
+        secure: false,
         pathRewrite: {
-          ['^' + process.env.VUE_APP_ENV_URL]: ''
+          ['^' + process.env.VUE_APP_BASE_API]: ''
         }
-      }
+      },
+      /*  ['/api']: {
+          target: `https://tool.bitefu.net/`,
+          changeOrigin: true, // 必须加上跨域
+          ws: false,
+          secure: true,
+          pathRewrite: {
+            ['^' + process.env.VUE_APP_BASE_API + '/api']: ''
+          }
+        }*/
     }
+    // after: require('./mock/mock-server.js') // 使用后台接口就注释掉
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

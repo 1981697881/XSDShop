@@ -59,7 +59,7 @@ export const constantRouterMap = [
     ]
   },
   {
-    path: '/yshop/materia/index',
+    path: '/materia/index',
     name: `images`,
     meta: {
       title: '上传图片',
@@ -71,7 +71,7 @@ export const constantRouterMap = [
 ]
 
 export default new Router({
-  mode: 'history',
+ /* mode: 'history',*/
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })

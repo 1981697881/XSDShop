@@ -32,7 +32,7 @@
 <script>
 import { add, edit, get } from '@/api/yxArticle'
 import picUpload from '@/components/pic-upload'
-import editor from '../../components/Editor'
+import editor from '@/views/components/Editor'
 import yamedit from '@/components/YamlEdit'
 import MaterialList from '@/components/material'
 import UeditorWrap from 'vue-ueditor-wrap';
@@ -97,9 +97,9 @@ export default {
   },
   methods: {
     addCustomDialog () {
-      window.UE.registerUI('yshop', function (editor, uiName) {
+      window.UE.registerUI('XSDShop', function (editor, uiName) {
         let dialog = new window.UE.ui.Dialog({
-          iframeUrl: '/yshop/materia/index',
+          iframeUrl: '/materia/index',
           editor: editor,
           name: uiName,
           title: '上传图片',
@@ -110,7 +110,7 @@ export default {
         var btn = new window.UE.ui.Button({
           name: 'dialog-button',
           title: '上传图片',
-          cssRules: `background-image: url(../../../assets/images/icons.png);background-position: -726px -77px;`,
+          cssRules: `background-image: url(require('@/assets/images/icons.png'));background-position: -726px -77px;`,
           onclick: function () {
             dialog.render();
             dialog.open();

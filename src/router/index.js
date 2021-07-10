@@ -12,6 +12,8 @@ NProgress.configure({ showSpinner: false })// NProgress Configuration
 const whiteList = ['/login']// no redirect whitelist
 
 router.beforeEach((to, from, next) => {
+  console.log(to)
+  console.log(from)
   if (to.meta.title) {
     document.title = to.meta.title + ' - ' + Config.title
   }

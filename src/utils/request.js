@@ -8,11 +8,12 @@ import errorCode from '@/utils/errorCode'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? process.env.VUE_APP_BASE_API : process.env.VUE_APP_ENV_URL, // api 的 base_url
+  baseURL: (process.env.NODE_ENV === 'production'?'https://gzfzdev.com':'') + process.env.VUE_APP_BASE_API, // api 的 base_url
   // baseURL: process.env.VUE_APP_ENV_URL,
+  withCredentials: true, // send cookies when cross-domain requests
   timeout: Config.timeout // 请求超时时间
 })
-
+window.apiUrl = service.defaults.baseURL
 // request拦截器
 service.interceptors.request.use(
   config => {
@@ -52,9 +53,9 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          //store.dispatch('LogOut').then(() => {
+          store.dispatch('LogOut').then(() => {
             location.reload() // 为了重新实例化vue-router对象 避免bug
-          //})
+          })
         })
       } else if (data_code === 500) {
         Notification.error({
@@ -95,9 +96,9 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          //store.dispatch('LogOut').then(() => {
+          store.dispatch('LogOut').then(() => {
             location.reload() // 为了重新实例化vue-router对象 避免bug
-          //})
+          })
         })
       } else if (code === 403) {
         router.push({ path: '/401' })

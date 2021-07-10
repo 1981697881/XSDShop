@@ -105,7 +105,7 @@
 <script>
 import { getCates } from '@/api/yxStoreCategory'
 import { add, edit, isFormatAttr, setAttr, clearAttr, getAttr } from '@/api/yxStoreProduct'
-import editor from '../../components/Editor'
+import editor from '@/views/components/Editor'
 import picUploadTwo from '@/components/pic-upload-two'
 import mulpicUpload from '@/components/mul-pic-upload'
 import Treeselect from '@riophae/vue-treeselect'
