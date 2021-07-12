@@ -23,11 +23,11 @@
           <el-form-item label="门店logo" prop="image">
             <MaterialList v-model="form.imageArr" style="width: 370px" type="image" :num="1" :width="150" :height="150" />
           </el-form-item>
-          <el-form-item label="纬度" prop="latitude">
-            <el-input v-model="form.latitude" style="width: 370px;" :disabled="true" />
+          <el-form-item label="纬度" prop="latitude"><!--:disabled="true"-->
+            <el-input v-model="form.latitude" style="width: 370px;"  />
           </el-form-item>
           <el-form-item label="经度" prop="longitude">
-            <el-input v-model="form.longitude" style="width: 370px;" :disabled="true" />
+            <el-input v-model="form.longitude" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="核销时效" prop="validTime">
             <el-date-picker

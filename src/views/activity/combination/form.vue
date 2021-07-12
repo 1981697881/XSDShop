@@ -243,7 +243,7 @@ export default {
         autoHeightEnabled: false, // 编辑器不自动被内容撑高
         initialFrameHeight: 500, // 初始容器高度
         initialFrameWidth: '100%', // 初始容器宽度
-        UEDITOR_HOME_URL: '/UEditor/',
+        UEDITOR_HOME_URL: process.env.NODE_ENV === 'production' ? '/XSDShop/UEditor/' : '/UEditor/',
         serverUrl: ''
       },
       form1: {

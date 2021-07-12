@@ -92,13 +92,13 @@ const user = {
     // 登出
     LogOut({ commit }) {
       return new Promise((resolve, reject) => {
-        logout().then(res => {
+       /* logout().then(res => {*/
           logOut(commit)
           resolve()
-        }).catch(error => {
+       /* }).catch(error => {
           logOut(commit)
           reject(error)
-        })
+        })*/
       })
     },
 
