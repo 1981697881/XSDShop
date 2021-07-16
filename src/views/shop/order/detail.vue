@@ -445,7 +445,7 @@
         </el-row>
       </el-form>
       <div slot="footer" style="text-align:center;padding-top: 15px">
-        <el-button type="primary" @click="saveStart('userform')">保存</el-button>
+        <el-button type="primary" @click="saveStart">保存</el-button>
       </div>
     </el-dialog>
     <eForm ref="form" :is-add="isAdd"/>
@@ -457,7 +457,7 @@
 <script>
   import {
     express, getOrderDetail,
-    getNowOrderStatus
+    getNowOrderStatus,getPSPlan,addPSPlan
   } from '@/api/yxStoreOrder'
   import {formatTimeTwo} from '@/utils/index';
   import eForm from './form'
@@ -616,6 +616,17 @@
     methods: {
       psjhChange(row, index, cg){
         this.visible = true
+        getPSPlan(id).then(response => {
+          this.list = response.data;
+          this.userDTO = this.order.userDTO;
+        });
+      },
+      saveStart(row, index, cg){
+        this.visible = true
+        addPSPlan(id).then(response => {
+          this.order = response;
+          this.userDTO = this.order.userDTO;
+        });
       },
       changeDate(val, row) {
         this.$set(row, 'routeNo', val)

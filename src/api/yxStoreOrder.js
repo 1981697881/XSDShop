@@ -89,3 +89,19 @@ export function getNowOrderStatus(id) {
     method: 'get'
   })
 }
+// 获取配送计划
+export function getPSPlan(data) {
+  return request({
+    url: 'mall/yxStoreOrder/express',
+    method: 'post',
+    data
+  })
+}
+// 保存配送计划
+export function addPSPlan(data) {
+  return request({
+    url: 'mall/yxStoreOrder/express',
+    method: 'post',
+    data
+  })
+}
