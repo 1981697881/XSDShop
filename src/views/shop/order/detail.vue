@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
     <div>
-      <el-steps v-if="order.refundStatus===0" :active="orderStatus.size" align-center process-status="process" finish-status="success">
+      <el-steps v-if="order.refundStatus===0" :active="orderStatus.size" align-center process-status="process"
+                finish-status="success">
         <el-step title="用户下单" :description="orderStatus.cacheKeyCreateOrder"></el-step>
         <el-step title="待发货" :description="orderStatus.paySuccess"></el-step>
         <el-step title="待收货" :description="orderStatus.deliveryGoods"></el-step>
@@ -143,7 +144,7 @@
       <el-table
         :data="order.cartInfoList"
         size="small"
-        style="width: 100%;margin-top: 20px" >
+        style="width: 100%;margin-top: 20px">
         <el-table-column label="商品图片" width="150" align="center">
           <template slot-scope="scope">
             <img :src="scope.row.cartInfoMap.productInfo.attrInfo.image" style="height: 80px">
@@ -170,9 +171,17 @@
             {{scope.row.cartInfoMap.cartNum}}
           </template>
         </el-table-column>
-        <el-table-column label="小计"  align="center">
+        <el-table-column label="小计" align="center">
           <template slot-scope="scope">
             ￥{{scope.row.cartInfoMap.truePrice}}
+          </template>
+        </el-table-column><!--v-if="order.pinkName=='[预售订单]'"-->
+        <el-table-column label="配送计划" width="100" >
+          <template slot-scope="scope">
+                  <span class="el-tag el-tag--success el-tag--mini" style="cursor: pointer;"
+                        @click="psjhChange(scope.row,scope.$index,true)">
+                 编辑
+                  </span>
           </template>
         </el-table-column>
       </el-table>
@@ -225,7 +234,7 @@
         <!--           &lt;!&ndash; {{scope.row.operateMan}}&ndash;&gt;-->
         <!--          </template>-->
         <!--        </el-table-column>-->
-        <el-table-column label="操作时间"  width="160" align="center">
+        <el-table-column label="操作时间" width="160" align="center">
           <template slot-scope="scope">
             {{scope.row.changeTime}}
           </template>
@@ -251,57 +260,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <div style="margin-top: 20px" v-if="order.pinkName=='[预售订单]'">
-        <svg-icon icon-class="marker" style="color: #606266"></svg-icon>
-        <span class="font-small">配送计划</span>
-      </div>
-      <div style="margin-top: 20px;margin-bottom: 10px" v-if="order.pinkName=='[预售订单]'">
-             <el-button @click="addMaster">添加</el-button>
-      </div>
-      <el-table v-if="order.pinkName=='[预售订单]'" el-table show-summary style="margin-top: 20px;width: 100%" :data="list" border size="mini" :highlight-current-row="true">
-        <el-table-column
-          v-for="(t,i) in columns"
-          :key="i"
-          align="center"
-          :prop="t.name"
-          :label="t.text"
-          v-if="t.default!=undefined?t.default:true"
-          :width="t.width?t.width:''"
-        >
-          <template slot-scope="scope">
-                <span v-if="scope.row.isSet">
-                  <div class="block"  v-if="t.name == 'routeNo'">
-                  <el-date-picker
-                    @change="changeDate($event,sel)"
-                    v-model="sel[t.name]"
-                    type="date"
-                    size="mini"
-                    :picker-options="pickerOptions"
-                    value-format="yyyy-MM-dd"
-                    placeholder="选择日期">
-                  </el-date-picker>
-                </div>
-                   <el-input-number size="mini" v-else-if="t.name == 'orderNo'" placeholder="请输入内容" v-model="sel[t.name]">
-                  </el-input-number>
-                   <span v-else>{{sel[t.name]}}</span>
-                </span>
-            <span v-else>{{scope.row[t.name]}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="100">
-          <template slot-scope="scope">
-                  <span class="el-tag el-tag--info el-tag--mini" style="cursor: pointer;" @click="pwdChange(scope.row,scope.$index,true)">
-                    {{scope.row.isSet?'确定':"修改"}}
-                  </span>
-            <span v-if="!scope.row.isSet" class="el-tag el-tag--danger el-tag--mini" @click="deleteRow(scope.$index,list)" style="cursor: pointer;">
-                    删除
-                  </span>
-            <span v-else class="el-tag  el-tag--mini" style="cursor: pointer;" @click="pwdChange(scope.row,scope.$index,false)">
-                    取消
-                  </span>
-          </template>
-        </el-table-column>
-      </el-table>
     </el-card>
     <el-dialog title="订单跟踪"
                :visible.sync="kuaidiDialogVisible"
@@ -310,10 +268,10 @@
                 :active="90"
                 finish-status="success"
                 space="50px">
-        <el-step  v-for="item in logisticsList"
-                  :key="item.acceptStation"
-                  :title="item.acceptStation"
-                  :description="item.acceptTime"></el-step>
+        <el-step v-for="item in logisticsList"
+                 :key="item.acceptStation"
+                 :title="item.acceptStation"
+                 :description="item.acceptTime"></el-step>
       </el-steps>
     </el-dialog>
     <!--    <el-dialog title="修改收货人信息"-->
@@ -422,748 +380,821 @@
         <el-button type="primary" @click="handleMarkOrder">确 定</el-button>
       </span>
     </el-dialog> -->
-
-    <eForm ref="form" :is-add="isAdd" />
-    <eRefund ref="form2" :is-add="isAdd" />
-    <editOrder ref="form3" :is-add="isAdd" />
-    <eRemark ref="form4" :is-add="isAdd" />
+    <el-dialog
+      :visible.sync="visible"
+      title="配送计划"
+      v-if="visible"
+      :width="'40%'"
+      destroy-on-close
+      append-to-body
+    >
+      <el-form :model="form" :rules="rules" ref="form" label-width="80px" :size="'mini'">
+        <div style="margin-top: 20px;margin-bottom: 10px">
+          <el-button @click="addMaster">添加</el-button>
+        </div>
+        <el-row :span="24">
+          <el-table el-table show-summary style="margin-top: 20px;width: 100%" :data="list" border size="mini"
+                    :highlight-current-row="true">
+            <el-table-column
+              v-for="(t,i) in columns"
+              :key="i"
+              align="center"
+              :prop="t.name"
+              :label="t.text"
+              v-if="t.default!=undefined?t.default:true"
+              :width="t.width?t.width:''"
+            >
+              <template slot-scope="scope">
+                <span v-if="scope.row.isSet">
+                  <div class="block" v-if="t.name == 'routeNo'">
+                  <el-date-picker
+                    @change="changeDate($event,sel)"
+                    v-model="sel[t.name]"
+                    type="date"
+                    size="mini"
+                    :picker-options="pickerOptions"
+                    value-format="yyyy-MM-dd"
+                    placeholder="选择日期">
+                  </el-date-picker>
+                </div>
+                   <el-input-number size="mini" v-else-if="t.name == 'orderNo'" placeholder="请输入内容"
+                                    v-model="sel[t.name]">
+                  </el-input-number>
+                   <span v-else>{{sel[t.name]}}</span>
+                </span>
+                <span v-else>{{scope.row[t.name]}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100">
+              <template slot-scope="scope">
+                  <span class="el-tag el-tag--info el-tag--mini" style="cursor: pointer;"
+                        @click="pwdChange(scope.row,scope.$index,true)">
+                    {{scope.row.isSet?'确定':"修改"}}
+                  </span>
+                <span v-if="!scope.row.isSet" class="el-tag el-tag--danger el-tag--mini"
+                      @click="deleteRow(scope.$index,list)" style="cursor: pointer;">
+                    删除
+                  </span>
+                <span v-else class="el-tag  el-tag--mini" style="cursor: pointer;"
+                      @click="pwdChange(scope.row,scope.$index,false)">
+                    取消
+                  </span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-row>
+      </el-form>
+      <div slot="footer" style="text-align:center;padding-top: 15px">
+        <el-button type="primary" @click="saveStart('userform')">保存</el-button>
+      </div>
+    </el-dialog>
+    <eForm ref="form" :is-add="isAdd"/>
+    <eRefund ref="form2" :is-add="isAdd"/>
+    <editOrder ref="form3" :is-add="isAdd"/>
+    <eRemark ref="form4" :is-add="isAdd"/>
   </div>
 </template>
 <script>
-import { express, getOrderDetail,
-  getNowOrderStatus} from '@/api/yxStoreOrder'
-import {formatTimeTwo} from '@/utils/index';
-import eForm from './form'
-import eRefund from './refund'
-import editOrder from './edit'
-import eRemark from './remark'
-const defaultReceiverInfo = {
-  orderId:null,
-  receiverName:null,
-  receiverPhone:null,
-  receiverPostCode:null,
-  receiverDetailAddress:null,
-  receiverProvince:null,
-  receiverCity:null,
-  receiverRegion:null,
-  status:null
-};
-export default {
-  components: {eForm, eRefund, editOrder, eRemark},
-  data() {
-    return {
-      pickerOptions: {
-        disabledDate: time => {
-          let beginDateVal = new Date()
-          beginDateVal = beginDateVal.setDate(beginDateVal.getDate() - 1)
-          beginDateVal = new Date(beginDateVal)
-          return time.getTime() <= beginDateVal;
+  import {
+    express, getOrderDetail,
+    getNowOrderStatus
+  } from '@/api/yxStoreOrder'
+  import {formatTimeTwo} from '@/utils/index';
+  import eForm from './form'
+  import eRefund from './refund'
+  import editOrder from './edit'
+  import eRemark from './remark'
+
+  const defaultReceiverInfo = {
+    orderId: null,
+    receiverName: null,
+    receiverPhone: null,
+    receiverPostCode: null,
+    receiverDetailAddress: null,
+    receiverProvince: null,
+    receiverCity: null,
+    receiverRegion: null,
+    status: null
+  };
+  export default {
+    components: {eForm, eRefund, editOrder, eRemark},
+    data() {
+      return {
+        pickerOptions: {
+          disabledDate: time => {
+            let beginDateVal = new Date()
+            beginDateVal = beginDateVal.setDate(beginDateVal.getDate() - 1)
+            beginDateVal = new Date(beginDateVal)
+            return time.getTime() <= beginDateVal;
+          },
         },
-      },
-      orderStatus:null,
-      isAdd: false,
-      id: null,
-      sel: null, // 选中行
-      list: [],
-      columns: [
-        { text: "id", name: "id", default: false },
-        { text: "配送日期", name: "routeNo" },
-        { text: "配送数量", name: "orderNo" },
-      ],
-      order: {
-
-      },
-      user:{
-
-      },
-      logisticsList:[],
-      receiverDialogVisible:false,
-      receiverInfo:Object.assign({},defaultReceiverInfo),
-      moneyDialogVisible:false,
-      moneyInfo:{orderId:null, freightAmount:0, discountAmount:0,status:null},
-      messageDialogVisible:false,
-      message: {title:null, content:null},
-      closeDialogVisible:false,
-      kuaidiDialogVisible:false,
-      closeInfo:{note:null,id:null},
-      markOrderDialogVisible:false,
-      markInfo:{note:null},
-      userDTO: {},
-      logisticsDialogVisible: {
         visible: false,
-        list: []
-      }
-    }
-  },
-  filters: {
-    formatNull(value) {
-      if(value===undefined||value===null||value===''){
-        return '暂无';
-      }else{
-        return value;
-      }
-    },
-    formatLongText(value) {
-      if(value===undefined||value===null||value===''){
-        return '暂无';
-      }else if(value.length>8){
-        return value.substr(0, 8) + '...';
-      }else{
-        return value;
-      }
-    },
-    formatSourceType(value) {
-      if (value === 1) {
-        return '小程序';
-      } else {
-        return '公众号/H5';
-      }
-    },
-    formatShippingType(value){
-      if (value === 1) {
-        return '快递';
-      } else {
-        return '门店自提';
-      }
-    },
-    formatAddress(order) {
-      let str = order.receiverProvince;
-      if (order.receiverCity != null) {
-        str += "  " + order.receiverCity;
-      }
-      str += "  " + order.receiverRegion;
-      str += "  " + order.receiverDetailAddress;
-      return str;
-    },
-    formatStatus(value) {
-      if (value === 1) {
-        return '待发货';
-      } else if (value === 2) {
-        return '已发货';
-      } else if (value === 3) {
-        return '已完成';
-      } else if (value === 4) {
-        return '已关闭';
-      } else if (value === 5) {
-        return '无效订单';
-      } else {
-        return '待付款';
-      }
-    },
-    formatPayStatus(value) {
-      if (value === 0) {
-        return '未支付';
-      } else if(value===4){
-        return '已退款';
-      }else{
-        return '已支付';
-      }
-    },
-    formatDeliverStatus(value) {
-      if (value === 0||value === 1) {
-        return '未发货';
-      } else {
-        return '已发货';
-      }
-    },
-    formatProductAttr(value){
-      if(value==null){
-        return '';
-      }else{
-        let attr = JSON.parse(value);
-        let result='';
-        for(let i=0;i<attr.length;i++){
-          result+=attr[i].key;
-          result+=":";
-          result+=attr[i].value;
-          result+=";";
-        }
-        return result;
-      }
-    }
-  },
-  mounted () {
-    this.init();
-  },
-  methods: {
-    changeDate(val, row){
-      this.$set(row, 'routeNo',val)
-    },
-    //读取表格数据
-    readMasterUser() {
-      //根据实际情况，自己改下啊
-      this.list.map(i => {
-        i.isSet = false; //给后台返回数据添加`isSet`标识
-        return i;
-      });
-    },
-    //修改
-    pwdChange(row, index, cg) {
-      //点击修改 判断是否已经保存所有操作
-      for (let i of this.list) {
-        if (i.isSet && i.userId != row.userId) {
-          this.$message.warning("请先保存当前编辑项");
-          return false;
+        orderStatus: null,
+        isAdd: false,
+        id: null,
+        sel: null, // 选中行
+        list: [],
+        columns: [
+          {text: "id", name: "id", default: false},
+          {text: "配送日期", name: "routeNo"},
+          {text: "配送数量", name: "orderNo"},
+        ],
+        rules: {
+        },
+        order: {},
+        form: {},
+        user: {},
+        logisticsList: [],
+        receiverDialogVisible: false,
+        receiverInfo: Object.assign({}, defaultReceiverInfo),
+        moneyDialogVisible: false,
+        moneyInfo: {orderId: null, freightAmount: 0, discountAmount: 0, status: null},
+        messageDialogVisible: false,
+        message: {title: null, content: null},
+        closeDialogVisible: false,
+        kuaidiDialogVisible: false,
+        closeInfo: {note: null, id: null},
+        markOrderDialogVisible: false,
+        markInfo: {note: null},
+        userDTO: {},
+        logisticsDialogVisible: {
+          visible: false,
+          list: []
         }
       }
-      //是否是取消操作
-      if (!cg) {
-        if (!this.sel.processId) this.list.splice(index, 1);
-        return row.isSet = !row.isSet;
+    },
+    filters: {
+      formatNull(value) {
+        if (value === undefined || value === null || value === '') {
+          return '暂无';
+        } else {
+          return value;
+        }
+      },
+      formatLongText(value) {
+        if (value === undefined || value === null || value === '') {
+          return '暂无';
+        } else if (value.length > 8) {
+          return value.substr(0, 8) + '...';
+        } else {
+          return value;
+        }
+      },
+      formatSourceType(value) {
+        if (value === 1) {
+          return '小程序';
+        } else {
+          return '公众号/H5';
+        }
+      },
+      formatShippingType(value) {
+        if (value === 1) {
+          return '快递';
+        } else {
+          return '门店自提';
+        }
+      },
+      formatAddress(order) {
+        let str = order.receiverProvince;
+        if (order.receiverCity != null) {
+          str += "  " + order.receiverCity;
+        }
+        str += "  " + order.receiverRegion;
+        str += "  " + order.receiverDetailAddress;
+        return str;
+      },
+      formatStatus(value) {
+        if (value === 1) {
+          return '待发货';
+        } else if (value === 2) {
+          return '已发货';
+        } else if (value === 3) {
+          return '已完成';
+        } else if (value === 4) {
+          return '已关闭';
+        } else if (value === 5) {
+          return '无效订单';
+        } else {
+          return '待付款';
+        }
+      },
+      formatPayStatus(value) {
+        if (value === 0) {
+          return '未支付';
+        } else if (value === 4) {
+          return '已退款';
+        } else {
+          return '已支付';
+        }
+      },
+      formatDeliverStatus(value) {
+        if (value === 0 || value === 1) {
+          return '未发货';
+        } else {
+          return '已发货';
+        }
+      },
+      formatProductAttr(value) {
+        if (value == null) {
+          return '';
+        } else {
+          let attr = JSON.parse(value);
+          let result = '';
+          for (let i = 0; i < attr.length; i++) {
+            result += attr[i].key;
+            result += ":";
+            result += attr[i].value;
+            result += ";";
+          }
+          return result;
+        }
       }
-      //提交数据
-      if (row.isSet) {
-        const sel = this.sel
-        if((sel.routeNo == null || sel.routeNo === '') || (sel.orderNo == null || sel.orderNo === '')){
-          return this.$message({
-            type: 'error',
-            message: "请输入必填项!"
-          });
-        }else {
-          let data = JSON.parse(JSON.stringify(this.sel));
-          for (let k in data) row[k] = data[k]
+    },
+    mounted() {
+      this.init();
+    },
+    methods: {
+      psjhChange(row, index, cg){
+        this.visible = true
+      },
+      changeDate(val, row) {
+        this.$set(row, 'routeNo', val)
+      },
+      //读取表格数据
+      readMasterUser() {
+        //根据实际情况，自己改下啊
+        this.list.map(i => {
+          i.isSet = false; //给后台返回数据添加`isSet`标识
+          return i;
+        });
+      },
+      //修改
+      pwdChange(row, index, cg) {
+        //点击修改 判断是否已经保存所有操作
+        for (let i of this.list) {
+          if (i.isSet && i.userId != row.userId) {
+            this.$message.warning("请先保存当前编辑项");
+            return false;
+          }
+        }
+        //是否是取消操作
+        if (!cg) {
+          if (!this.sel.processId) this.list.splice(index, 1);
+          return row.isSet = !row.isSet;
+        }
+        //提交数据
+        if (row.isSet) {
+          const sel = this.sel
+          if ((sel.routeNo == null || sel.routeNo === '') || (sel.orderNo == null || sel.orderNo === '')) {
+            return this.$message({
+              type: 'error',
+              message: "请输入必填项!"
+            });
+          } else {
+            let data = JSON.parse(JSON.stringify(this.sel));
+            for (let k in data) row[k] = data[k]
+            this.$message({
+              type: 'success',
+              message: "添加成功!"
+            });
+            //然后这边重新读取表格数据
+            this.readMasterUser();
+            row.isSet = false;
+          }
+        } else {
+          this.sel = JSON.parse(JSON.stringify(row));
+          row.isSet = true;
+        }
+      },
+      //删除带确认区 单行删除
+      deleteRow(row, index, rows) {
+        this.result.forEach((item, index2) => {
+          if (row.processRouteDetailId == item) {
+            this.result.splice(index2, 1);
+          }
+        })
+        console.log(this.result)
+        console.log(row)
+        rows.splice(index, 1);
+      },
+      //添加
+      addMaster() {
+        for (let i of this.list) {
+          if (i.isSet) return this.$message.warning("请先保存当前编辑项");
+        }
+        this.cIndex += 10
+        let j = {isSet: true, orderNo: this.cIndex, routeNo: '', orderNo: ''};
+        this.list.push(j);
+        this.sel = JSON.parse(JSON.stringify(j));
+      },
+      refund(data) {
+        this.isAdd = false
+        const _this = this.$refs.form2
+        _this.form = {
+          id: data.id,
+          orderId: data.orderId,
+          uid: data.uid,
+          realName: data.realName,
+          userPhone: data.userPhone,
+          userAddress: data.userAddress,
+          cartId: data.cartId,
+          freightPrice: data.freightPrice,
+          totalNum: data.totalNum,
+          totalPrice: data.totalPrice,
+          totalPostage: data.totalPostage,
+          payPrice: data.payPrice,
+          payPostage: data.payPostage,
+          deductionPrice: data.deductionPrice,
+          couponId: data.couponId,
+          couponPrice: data.couponPrice,
+          paid: data.paid,
+          payTime: data.payTime,
+          payType: data.payType,
+          addTime: data.addTime,
+          status: data.status,
+          refundStatus: data.refundStatus,
+          refundReasonWapImg: data.refundReasonWapImg,
+          refundReasonWapExplain: data.refundReasonWapExplain,
+          refundReasonTime: data.refundReasonTime,
+          refundReasonWap: data.refundReasonWap,
+          refundReason: data.refundReason,
+          refundPrice: data.refundPrice,
+          deliveryName: data.deliveryName,
+          deliveryType: data.deliveryType,
+          deliveryId: data.deliveryId,
+          gainIntegral: data.gainIntegral,
+          useIntegral: data.useIntegral,
+          backIntegral: data.backIntegral,
+          mark: data.mark,
+          isDel: data.isDel,
+          unique: data.unique,
+          remark: data.remark,
+          merId: data.merId,
+          isMerCheck: data.isMerCheck,
+          combinationId: data.combinationId,
+          pinkId: data.pinkId,
+          cost: data.cost,
+          seckillId: data.seckillId,
+          bargainId: data.bargainId,
+          verifyCode: data.verifyCode,
+          storeId: data.storeId,
+          shippingType: data.shippingType,
+          isChannel: data.isChannel,
+          isRemind: data.isRemind,
+          payIntegral: data.payIntegral,
+          isSystemDel: data.isSystemDel
+        }
+        _this.dialog = true
+      },
+      edit(data) {
+        this.isAdd = false
+        const _this = this.$refs.form
+        _this.form = {
+          id: data.id,
+          orderId: data.orderId,
+          uid: data.uid,
+          realName: data.realName,
+          userPhone: data.userPhone,
+          userAddress: data.userAddress,
+          cartId: data.cartId,
+          freightPrice: data.freightPrice,
+          totalNum: data.totalNum,
+          totalPrice: data.totalPrice,
+          totalPostage: data.totalPostage,
+          payPrice: data.payPrice,
+          payPostage: data.payPostage,
+          deductionPrice: data.deductionPrice,
+          couponId: data.couponId,
+          couponPrice: data.couponPrice,
+          paid: data.paid,
+          payTime: data.payTime,
+          payType: data.payType,
+          addTime: data.addTime,
+          status: data.status,
+          refundStatus: data.refundStatus,
+          refundReasonWapImg: data.refundReasonWapImg,
+          refundReasonWapExplain: data.refundReasonWapExplain,
+          refundReasonTime: data.refundReasonTime,
+          refundReasonWap: data.refundReasonWap,
+          refundReason: data.refundReason,
+          refundPrice: data.refundPrice,
+          deliveryName: data.deliveryName,
+          deliverySn: data.deliverySn,
+          deliveryType: data.deliveryType,
+          deliveryId: data.deliveryId,
+          gainIntegral: data.gainIntegral,
+          useIntegral: data.useIntegral,
+          backIntegral: data.backIntegral,
+          mark: data.mark,
+          isDel: data.isDel,
+          unique: data.unique,
+          remark: data.remark,
+          merId: data.merId,
+          isMerCheck: data.isMerCheck,
+          combinationId: data.combinationId,
+          pinkId: data.pinkId,
+          cost: data.cost,
+          seckillId: data.seckillId,
+          bargainId: data.bargainId,
+          verifyCode: data.verifyCode,
+          storeId: data.storeId,
+          shippingType: data.shippingType,
+          isChannel: data.isChannel,
+          isRemind: data.isRemind,
+          payIntegral: data.payIntegral,
+          isSystemDel: data.isSystemDel
+        }
+        _this.dialog = true
+      },
+      editOrder(data) {
+        this.isAdd = false
+        const _this = this.$refs.form3
+        _this.form = {
+          id: data.id,
+          orderId: data.orderId,
+          uid: data.uid,
+          realName: data.realName,
+          userPhone: data.userPhone,
+          userAddress: data.userAddress,
+          cartId: data.cartId,
+          freightPrice: data.freightPrice,
+          totalNum: data.totalNum,
+          totalPrice: data.totalPrice,
+          totalPostage: data.totalPostage,
+          payPrice: data.payPrice,
+          payPostage: data.payPostage,
+          deductionPrice: data.deductionPrice,
+          couponId: data.couponId,
+          couponPrice: data.couponPrice,
+          paid: data.paid,
+          payTime: data.payTime,
+          payType: data.payType,
+          addTime: data.addTime,
+          status: data.status,
+          refundStatus: data.refundStatus,
+          refundReasonWapImg: data.refundReasonWapImg,
+          refundReasonWapExplain: data.refundReasonWapExplain,
+          refundReasonTime: data.refundReasonTime,
+          refundReasonWap: data.refundReasonWap,
+          refundReason: data.refundReason,
+          refundPrice: data.refundPrice,
+          deliveryName: data.deliveryName,
+          deliveryType: data.deliveryType,
+          deliveryId: data.deliveryId,
+          gainIntegral: data.gainIntegral,
+          useIntegral: data.useIntegral,
+          backIntegral: data.backIntegral,
+          mark: data.mark,
+          isDel: data.isDel,
+          unique: data.unique,
+          remark: data.remark,
+          merId: data.merId,
+          isMerCheck: data.isMerCheck,
+          combinationId: data.combinationId,
+          pinkId: data.pinkId,
+          cost: data.cost,
+          seckillId: data.seckillId,
+          bargainId: data.bargainId,
+          verifyCode: data.verifyCode,
+          storeId: data.storeId,
+          shippingType: data.shippingType,
+          isChannel: data.isChannel,
+          isRemind: data.isRemind,
+          payIntegral: data.payIntegral,
+          isSystemDel: data.isSystemDel
+        }
+        _this.dialog = true
+      },
+      remark(data) {
+        this.isAdd = false
+        const _this = this.$refs.form4
+        _this.form = {
+          id: data.id,
+          orderId: data.orderId,
+          uid: data.uid,
+          realName: data.realName,
+          userPhone: data.userPhone,
+          userAddress: data.userAddress,
+          cartId: data.cartId,
+          freightPrice: data.freightPrice,
+          totalNum: data.totalNum,
+          totalPrice: data.totalPrice,
+          totalPostage: data.totalPostage,
+          payPrice: data.payPrice,
+          payPostage: data.payPostage,
+          deductionPrice: data.deductionPrice,
+          couponId: data.couponId,
+          couponPrice: data.couponPrice,
+          paid: data.paid,
+          payTime: data.payTime,
+          payType: data.payType,
+          addTime: data.addTime,
+          status: data.status,
+          refundStatus: data.refundStatus,
+          refundReasonWapImg: data.refundReasonWapImg,
+          refundReasonWapExplain: data.refundReasonWapExplain,
+          refundReasonTime: data.refundReasonTime,
+          refundReasonWap: data.refundReasonWap,
+          refundReason: data.refundReason,
+          refundPrice: data.refundPrice,
+          deliveryName: data.deliveryName,
+          deliveryType: data.deliveryType,
+          deliveryId: data.deliveryId,
+          gainIntegral: data.gainIntegral,
+          useIntegral: data.useIntegral,
+          backIntegral: data.backIntegral,
+          mark: data.mark,
+          isDel: data.isDel,
+          unique: data.unique,
+          remark: data.remark,
+          merId: data.merId,
+          isMerCheck: data.isMerCheck,
+          combinationId: data.combinationId,
+          pinkId: data.pinkId,
+          cost: data.cost,
+          seckillId: data.seckillId,
+          bargainId: data.bargainId,
+          verifyCode: data.verifyCode,
+          storeId: data.storeId,
+          shippingType: data.shippingType,
+          isChannel: data.isChannel,
+          isRemind: data.isRemind,
+          payIntegral: data.payIntegral,
+          isSystemDel: data.isSystemDel
+        }
+        _this.dialog = true
+      },
+
+      express() {
+        let params = {
+          "orderCode": this.order.id,
+          "shipperCode": this.order.deliverySn,
+          "logisticCode": this.order.deliveryId
+        }
+
+        express(params).then(res => {
+          console.log(res, 89888)
+          this.expressInfo = res.Traces
+          this.kuaidiDialogVisible = true;
+          this.logisticsList = this.expressInfo
+        }).catch(err => {
+        })
+
+      },
+      init() {
+        let that = this;
+        let id = that.$route.params.id || 0;
+        this.getNowOrderStatus();
+        getOrderDetail(id).then(response => {
+          this.order = response;
+          this.userDTO = this.order.userDTO;
+        });
+      },
+      onSelectRegion(data) {
+        this.receiverInfo.receiverProvince = data.province.value;
+        this.receiverInfo.receiverCity = data.city.value;
+        this.receiverInfo.receiverRegion = data.area.value;
+      },
+      formatTime(time) {
+        if (time == null || time === '') {
+          return '';
+        }
+        let date = new Date(time);
+        return formatTimeTwo(date, 'yyyy-MM-dd hh:mm:ss')
+      },
+      formatStepStatus(value) {
+        //todo  1-未付款 2-未发货 3-退款中 4-待收货 5-待评价 6-已完成 7-已退款
+        if (value === 1) {
+          //待发货
+          return 1;
+        } else if (value === 2) {
+          //已发货
+          return 3;
+        } else if (value === 3) {
+          //已完成
+          return 4;
+        } else if (value === 4) {
+          //已完成
+          return 5;
+        } else if (value === 5) {
+          //已完成
+          return 4;
+        } else {
+          //待付款、已关闭、无限订单
+          return 1;
+        }
+      },
+      showUpdateReceiverDialog() {
+        this.receiverDialogVisible = true;
+        this.receiverInfo = {
+          orderId: this.order.id,
+          receiverName: this.order.receiverName,
+          receiverPhone: this.order.receiverPhone,
+          receiverPostCode: this.order.receiverPostCode,
+          receiverDetailAddress: this.order.receiverDetailAddress,
+          receiverProvince: this.order.receiverProvince,
+          receiverCity: this.order.receiverCity,
+          receiverRegion: this.order.receiverRegion,
+          status: this.order._status
+        }
+      },
+      handleUpdateReceiverInfo() {
+        this.$confirm('是否要修改收货信息?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // updateReceiverInfo(this.receiverInfo).then(response=>{
+          //   this.receiverDialogVisible=false;
+          //   this.$message({
+          //     type: 'success',
+          //     message: '修改成功!'
+          //   });
+          //   getOrderDetail(this.id).then(response => {
+          //     this.order = response.data;
+          //   });
+          // });
+        });
+      },
+      showUpdateMoneyDialog() {
+        this.moneyDialogVisible = true;
+        this.moneyInfo.orderId = this.order.id;
+        this.moneyInfo.freightAmount = this.order.freightAmount;
+        this.moneyInfo.discountAmount = this.order.discountAmount;
+        this.moneyInfo.status = this.order._status;
+      },
+      handleUpdateMoneyInfo() {
+        this.$confirm('是否要修改费用信息?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.moneyDialogVisible = false;
+          // updateMoneyInfo(this.moneyInfo).then(response=>{
+          //   this.moneyDialogVisible=false;
+          //   this.$message({
+          //     type: 'success',
+          //     message: '修改成功!'
+          //   });
+          //   getOrderDetail(this.id).then(response => {
+          //     this.order = response.data;
+          //   });
+          // });
+        });
+      },
+      showMessageDialog() {
+        this.messageDialogVisible = true;
+        this.message.title = null;
+        this.message.content = null;
+      },
+      handleSendMessage() {
+        this.$confirm('是否要发送站内信?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.messageDialogVisible = false;
           this.$message({
             type: 'success',
-            message: "添加成功!"
+            message: '发送成功!'
           });
-          //然后这边重新读取表格数据
-          this.readMasterUser();
-          row.isSet = false;
-        }
-      } else {
-        this.sel = JSON.parse(JSON.stringify(row));
-        row.isSet = true;
-      }
-    },
-    //删除带确认区 单行删除
-    deleteRow(row, index, rows) {
-      this.result.forEach((item, index2) =>{
-        if(row.processRouteDetailId == item){
-          this.result.splice(index2,1);
-        }
-      })
-      console.log(this.result)
-      console.log(row)
-      rows.splice(index, 1);
-    },
-    //添加
-    addMaster() {
-      for (let i of this.list) {
-        if (i.isSet) return this.$message.warning("请先保存当前编辑项");
-      }
-      this.cIndex += 10
-      let j = {isSet: true, orderNo: this.cIndex, routeNo: '', orderNo: ''};
-      this.list.push(j);
-      this.sel = JSON.parse(JSON.stringify(j));
-    },
-    refund(data) {
-      this.isAdd = false
-      const _this = this.$refs.form2
-      _this.form = {
-        id: data.id,
-        orderId: data.orderId,
-        uid: data.uid,
-        realName: data.realName,
-        userPhone: data.userPhone,
-        userAddress: data.userAddress,
-        cartId: data.cartId,
-        freightPrice: data.freightPrice,
-        totalNum: data.totalNum,
-        totalPrice: data.totalPrice,
-        totalPostage: data.totalPostage,
-        payPrice: data.payPrice,
-        payPostage: data.payPostage,
-        deductionPrice: data.deductionPrice,
-        couponId: data.couponId,
-        couponPrice: data.couponPrice,
-        paid: data.paid,
-        payTime: data.payTime,
-        payType: data.payType,
-        addTime: data.addTime,
-        status: data.status,
-        refundStatus: data.refundStatus,
-        refundReasonWapImg: data.refundReasonWapImg,
-        refundReasonWapExplain: data.refundReasonWapExplain,
-        refundReasonTime: data.refundReasonTime,
-        refundReasonWap: data.refundReasonWap,
-        refundReason: data.refundReason,
-        refundPrice: data.refundPrice,
-        deliveryName: data.deliveryName,
-        deliveryType: data.deliveryType,
-        deliveryId: data.deliveryId,
-        gainIntegral: data.gainIntegral,
-        useIntegral: data.useIntegral,
-        backIntegral: data.backIntegral,
-        mark: data.mark,
-        isDel: data.isDel,
-        unique: data.unique,
-        remark: data.remark,
-        merId: data.merId,
-        isMerCheck: data.isMerCheck,
-        combinationId: data.combinationId,
-        pinkId: data.pinkId,
-        cost: data.cost,
-        seckillId: data.seckillId,
-        bargainId: data.bargainId,
-        verifyCode: data.verifyCode,
-        storeId: data.storeId,
-        shippingType: data.shippingType,
-        isChannel: data.isChannel,
-        isRemind: data.isRemind,
-        payIntegral: data.payIntegral,
-        isSystemDel: data.isSystemDel
-      }
-      _this.dialog = true
-    },
-    edit(data) {
-      this.isAdd = false
-      const _this = this.$refs.form
-      _this.form = {
-        id: data.id,
-        orderId: data.orderId,
-        uid: data.uid,
-        realName: data.realName,
-        userPhone: data.userPhone,
-        userAddress: data.userAddress,
-        cartId: data.cartId,
-        freightPrice: data.freightPrice,
-        totalNum: data.totalNum,
-        totalPrice: data.totalPrice,
-        totalPostage: data.totalPostage,
-        payPrice: data.payPrice,
-        payPostage: data.payPostage,
-        deductionPrice: data.deductionPrice,
-        couponId: data.couponId,
-        couponPrice: data.couponPrice,
-        paid: data.paid,
-        payTime: data.payTime,
-        payType: data.payType,
-        addTime: data.addTime,
-        status: data.status,
-        refundStatus: data.refundStatus,
-        refundReasonWapImg: data.refundReasonWapImg,
-        refundReasonWapExplain: data.refundReasonWapExplain,
-        refundReasonTime: data.refundReasonTime,
-        refundReasonWap: data.refundReasonWap,
-        refundReason: data.refundReason,
-        refundPrice: data.refundPrice,
-        deliveryName: data.deliveryName,
-        deliverySn: data.deliverySn,
-        deliveryType: data.deliveryType,
-        deliveryId: data.deliveryId,
-        gainIntegral: data.gainIntegral,
-        useIntegral: data.useIntegral,
-        backIntegral: data.backIntegral,
-        mark: data.mark,
-        isDel: data.isDel,
-        unique: data.unique,
-        remark: data.remark,
-        merId: data.merId,
-        isMerCheck: data.isMerCheck,
-        combinationId: data.combinationId,
-        pinkId: data.pinkId,
-        cost: data.cost,
-        seckillId: data.seckillId,
-        bargainId: data.bargainId,
-        verifyCode: data.verifyCode,
-        storeId: data.storeId,
-        shippingType: data.shippingType,
-        isChannel: data.isChannel,
-        isRemind: data.isRemind,
-        payIntegral: data.payIntegral,
-        isSystemDel: data.isSystemDel
-      }
-      _this.dialog = true
-    },
-    editOrder(data) {
-      this.isAdd = false
-      const _this = this.$refs.form3
-      _this.form = {
-        id: data.id,
-        orderId: data.orderId,
-        uid: data.uid,
-        realName: data.realName,
-        userPhone: data.userPhone,
-        userAddress: data.userAddress,
-        cartId: data.cartId,
-        freightPrice: data.freightPrice,
-        totalNum: data.totalNum,
-        totalPrice: data.totalPrice,
-        totalPostage: data.totalPostage,
-        payPrice: data.payPrice,
-        payPostage: data.payPostage,
-        deductionPrice: data.deductionPrice,
-        couponId: data.couponId,
-        couponPrice: data.couponPrice,
-        paid: data.paid,
-        payTime: data.payTime,
-        payType: data.payType,
-        addTime: data.addTime,
-        status: data.status,
-        refundStatus: data.refundStatus,
-        refundReasonWapImg: data.refundReasonWapImg,
-        refundReasonWapExplain: data.refundReasonWapExplain,
-        refundReasonTime: data.refundReasonTime,
-        refundReasonWap: data.refundReasonWap,
-        refundReason: data.refundReason,
-        refundPrice: data.refundPrice,
-        deliveryName: data.deliveryName,
-        deliveryType: data.deliveryType,
-        deliveryId: data.deliveryId,
-        gainIntegral: data.gainIntegral,
-        useIntegral: data.useIntegral,
-        backIntegral: data.backIntegral,
-        mark: data.mark,
-        isDel: data.isDel,
-        unique: data.unique,
-        remark: data.remark,
-        merId: data.merId,
-        isMerCheck: data.isMerCheck,
-        combinationId: data.combinationId,
-        pinkId: data.pinkId,
-        cost: data.cost,
-        seckillId: data.seckillId,
-        bargainId: data.bargainId,
-        verifyCode: data.verifyCode,
-        storeId: data.storeId,
-        shippingType: data.shippingType,
-        isChannel: data.isChannel,
-        isRemind: data.isRemind,
-        payIntegral: data.payIntegral,
-        isSystemDel: data.isSystemDel
-      }
-      _this.dialog = true
-    },
-    remark(data) {
-      this.isAdd = false
-      const _this = this.$refs.form4
-      _this.form = {
-        id: data.id,
-        orderId: data.orderId,
-        uid: data.uid,
-        realName: data.realName,
-        userPhone: data.userPhone,
-        userAddress: data.userAddress,
-        cartId: data.cartId,
-        freightPrice: data.freightPrice,
-        totalNum: data.totalNum,
-        totalPrice: data.totalPrice,
-        totalPostage: data.totalPostage,
-        payPrice: data.payPrice,
-        payPostage: data.payPostage,
-        deductionPrice: data.deductionPrice,
-        couponId: data.couponId,
-        couponPrice: data.couponPrice,
-        paid: data.paid,
-        payTime: data.payTime,
-        payType: data.payType,
-        addTime: data.addTime,
-        status: data.status,
-        refundStatus: data.refundStatus,
-        refundReasonWapImg: data.refundReasonWapImg,
-        refundReasonWapExplain: data.refundReasonWapExplain,
-        refundReasonTime: data.refundReasonTime,
-        refundReasonWap: data.refundReasonWap,
-        refundReason: data.refundReason,
-        refundPrice: data.refundPrice,
-        deliveryName: data.deliveryName,
-        deliveryType: data.deliveryType,
-        deliveryId: data.deliveryId,
-        gainIntegral: data.gainIntegral,
-        useIntegral: data.useIntegral,
-        backIntegral: data.backIntegral,
-        mark: data.mark,
-        isDel: data.isDel,
-        unique: data.unique,
-        remark: data.remark,
-        merId: data.merId,
-        isMerCheck: data.isMerCheck,
-        combinationId: data.combinationId,
-        pinkId: data.pinkId,
-        cost: data.cost,
-        seckillId: data.seckillId,
-        bargainId: data.bargainId,
-        verifyCode: data.verifyCode,
-        storeId: data.storeId,
-        shippingType: data.shippingType,
-        isChannel: data.isChannel,
-        isRemind: data.isRemind,
-        payIntegral: data.payIntegral,
-        isSystemDel: data.isSystemDel
-      }
-      _this.dialog = true
-    },
-
-    express() {
-      let params ={
-        "orderCode": this.order.id,
-        "shipperCode": this.order.deliverySn,
-        "logisticCode": this.order.deliveryId
-      }
-
-      express(params).then(res=>{
-        console.log(res,89888)
-        this.expressInfo = res.Traces
-        this.kuaidiDialogVisible=true;
-        this.logisticsList = this.expressInfo
-      }).catch(err => {
-      })
-
-    },
-    init(){
-      let that = this;
-      let id = that.$route.params.id || 0;
-      this.getNowOrderStatus();
-      getOrderDetail(id).then(response => {
-        this.order = response;
-        this.userDTO = this.order.userDTO;
-      });
-    },
-    onSelectRegion(data){
-      this.receiverInfo.receiverProvince=data.province.value;
-      this.receiverInfo.receiverCity=data.city.value;
-      this.receiverInfo.receiverRegion=data.area.value;
-    },
-    formatTime(time) {
-      if (time == null || time === '') {
-        return '';
-      }
-      let date = new Date(time);
-      return formatTimeTwo(date, 'yyyy-MM-dd hh:mm:ss')
-    },
-    formatStepStatus(value) {
-      //todo  1-未付款 2-未发货 3-退款中 4-待收货 5-待评价 6-已完成 7-已退款
-      if (value === 1) {
-        //待发货
-        return 1;
-      } else if (value === 2) {
-        //已发货
-        return 3;
-      } else if (value === 3) {
-        //已完成
-        return 4;
-      } else if (value === 4) {
-        //已完成
-        return 5;
-      } else if (value === 5) {
-        //已完成
-        return 4;
-      }else {
-        //待付款、已关闭、无限订单
-        return 1;
-      }
-    },
-    showUpdateReceiverDialog(){
-      this.receiverDialogVisible=true;
-      this.receiverInfo={
-        orderId:this.order.id,
-        receiverName:this.order.receiverName,
-        receiverPhone:this.order.receiverPhone,
-        receiverPostCode:this.order.receiverPostCode,
-        receiverDetailAddress:this.order.receiverDetailAddress,
-        receiverProvince:this.order.receiverProvince,
-        receiverCity:this.order.receiverCity,
-        receiverRegion:this.order.receiverRegion,
-        status:this.order._status
-      }
-    },
-    handleUpdateReceiverInfo(){
-      this.$confirm('是否要修改收货信息?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        // updateReceiverInfo(this.receiverInfo).then(response=>{
-        //   this.receiverDialogVisible=false;
-        //   this.$message({
-        //     type: 'success',
-        //     message: '修改成功!'
-        //   });
-        //   getOrderDetail(this.id).then(response => {
-        //     this.order = response.data;
-        //   });
-        // });
-      });
-    },
-    showUpdateMoneyDialog(){
-      this.moneyDialogVisible=true;
-      this.moneyInfo.orderId=this.order.id;
-      this.moneyInfo.freightAmount=this.order.freightAmount;
-      this.moneyInfo.discountAmount=this.order.discountAmount;
-      this.moneyInfo.status=this.order._status;
-    },
-    handleUpdateMoneyInfo(){
-      this.$confirm('是否要修改费用信息?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.moneyDialogVisible=false;
-        // updateMoneyInfo(this.moneyInfo).then(response=>{
-        //   this.moneyDialogVisible=false;
-        //   this.$message({
-        //     type: 'success',
-        //     message: '修改成功!'
-        //   });
-        //   getOrderDetail(this.id).then(response => {
-        //     this.order = response.data;
-        //   });
-        // });
-      });
-    },
-    showMessageDialog(){
-      this.messageDialogVisible=true;
-      this.message.title=null;
-      this.message.content=null;
-    },
-    handleSendMessage(){
-      this.$confirm('是否要发送站内信?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.messageDialogVisible=false;
-        this.$message({
-          type: 'success',
-          message: '发送成功!'
         });
-      });
-    },
-    showCloseOrderDialog(){
-      this.closeDialogVisible=true;
-      this.closeInfo.note=null;
-      this.closeInfo.id=this.id;
-    },
+      },
+      showCloseOrderDialog() {
+        this.closeDialogVisible = true;
+        this.closeInfo.note = null;
+        this.closeInfo.id = this.id;
+      },
 
-    // handleCloseOrder(){
-    //   this.$confirm('是否要关闭?', '提示', {
-    //     confirmButtonText: '确定',
-    //     cancelButtonText: '取消',
-    //     type: 'warning'
-    //   }).then(() => {
-    //     let params = new URLSearchParams();
-    //     params.append("ids",[this.closeInfo.id]);
-    //     params.append("note",this.closeInfo.note);
-    //     closeOrder(params).then(response=>{
-    //       this.closeDialogVisible=false;
-    //       this.$message({
-    //         type: 'success',
-    //         message: '订单关闭成功!'
-    //       });
-    //       getOrderDetail(this.id).then(response => {
-    //         this.order = response.data;
-    //       });
-    //     });
-    //   });
-    // },
-    showMarkOrderDialog(){
-      this.markOrderDialogVisible=true;
-      this.markInfo.id=this.id;
-      this.order.remark=null;
-    },
-    handleMarkOrder(){
-      this.$confirm('是否要备注订单?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        let params = new URLSearchParams();
-        params.append("id",this.markInfo.id);
-        params.append("note",this.markInfo.note);
-        params.append("status",this.order._status);
-        // updateOrderNote(params).then(response=>{
-        //   this.markOrderDialogVisible=false;
-        //   this.$message({
-        //     type: 'success',
-        //     message: '订单备注成功!'
-        //   });
-        //   getOrderDetail(this.id).then(response => {
-        //     this.order = response.data;
-        //   });
-        // });
-      });
-    },
-    handleDeleteOrder(){
-      this.$confirm('是否要进行该删除操作?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        let params = new URLSearchParams();
-        params.append("ids",[this.id]);
-        // deleteOrder(params).then(response=>{
-        //   this.$message({
-        //     message: '删除成功！',
-        //     type: 'success',
-        //     duration: 1000
-        //   });
-        //   this.$router.back();
-        // });
-      })
-    },
-    showLogisticsDialog(){
-      this.express();
-
-    }, //获取当前订单状态
-
-    getNowOrderStatus() {
-      let id = this.$route.params.id || 0;
-
-      getNowOrderStatus(id)
-        .then(res => {
-          this.orderStatus = res;
+      // handleCloseOrder(){
+      //   this.$confirm('是否要关闭?', '提示', {
+      //     confirmButtonText: '确定',
+      //     cancelButtonText: '取消',
+      //     type: 'warning'
+      //   }).then(() => {
+      //     let params = new URLSearchParams();
+      //     params.append("ids",[this.closeInfo.id]);
+      //     params.append("note",this.closeInfo.note);
+      //     closeOrder(params).then(response=>{
+      //       this.closeDialogVisible=false;
+      //       this.$message({
+      //         type: 'success',
+      //         message: '订单关闭成功!'
+      //       });
+      //       getOrderDetail(this.id).then(response => {
+      //         this.order = response.data;
+      //       });
+      //     });
+      //   });
+      // },
+      showMarkOrderDialog() {
+        this.markOrderDialogVisible = true;
+        this.markInfo.id = this.id;
+        this.order.remark = null;
+      },
+      handleMarkOrder() {
+        this.$confirm('是否要备注订单?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let params = new URLSearchParams();
+          params.append("id", this.markInfo.id);
+          params.append("note", this.markInfo.note);
+          params.append("status", this.order._status);
+          // updateOrderNote(params).then(response=>{
+          //   this.markOrderDialogVisible=false;
+          //   this.$message({
+          //     type: 'success',
+          //     message: '订单备注成功!'
+          //   });
+          //   getOrderDetail(this.id).then(response => {
+          //     this.order = response.data;
+          //   });
+          // });
+        });
+      },
+      handleDeleteOrder() {
+        this.$confirm('是否要进行该删除操作?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let params = new URLSearchParams();
+          params.append("ids", [this.id]);
+          // deleteOrder(params).then(response=>{
+          //   this.$message({
+          //     message: '删除成功！',
+          //     type: 'success',
+          //     duration: 1000
+          //   });
+          //   this.$router.back();
+          // });
         })
-        .catch(err => {
-          console.log(err.response.data.message);
-        });
-    },
+      },
+      showLogisticsDialog() {
+        this.express();
+
+      }, //获取当前订单状态
+
+      getNowOrderStatus() {
+        let id = this.$route.params.id || 0;
+
+        getNowOrderStatus(id)
+          .then(res => {
+            this.orderStatus = res;
+          })
+          .catch(err => {
+            console.log(err.response.data.message);
+          });
+      },
+    }
   }
-}
 </script>
 <style scoped>
-.detail-container {
-  width: 80%;
-  padding: 20px 20px 20px 20px;
-  margin: 20px auto;
-}
+  .detail-container {
+    width: 80%;
+    padding: 20px 20px 20px 20px;
+    margin: 20px auto;
+  }
 
-.operate-container {
-  background: #F2F6FC;
-  height: 80px;
-  margin: -20px -20px 0;
-  line-height: 80px;
-}
+  .operate-container {
+    background: #F2F6FC;
+    height: 80px;
+    margin: -20px -20px 0;
+    line-height: 80px;
+  }
 
-.operate-button-container {
-  float: right;
-  margin-right: 20px
-}
+  .operate-button-container {
+    float: right;
+    margin-right: 20px
+  }
 
-.table-layout {
-  margin-top: 20px;
-  border-left: 1px solid #DCDFE6;
-  border-top: 1px solid #DCDFE6;
-}
+  .table-layout {
+    margin-top: 20px;
+    border-left: 1px solid #DCDFE6;
+    border-top: 1px solid #DCDFE6;
+  }
 
-.table-cell {
-  height: 60px;
-  line-height: 40px;
-  border-right: 1px solid #DCDFE6;
-  border-bottom: 1px solid #DCDFE6;
-  padding: 10px;
-  font-size: 14px;
-  color: #606266;
-  text-align: center;
-  overflow: hidden;
-}
+  .table-cell {
+    height: 60px;
+    line-height: 40px;
+    border-right: 1px solid #DCDFE6;
+    border-bottom: 1px solid #DCDFE6;
+    padding: 10px;
+    font-size: 14px;
+    color: #606266;
+    text-align: center;
+    overflow: hidden;
+  }
 
-.table-cell-title {
-  border-right: 1px solid #DCDFE6;
-  border-bottom: 1px solid #DCDFE6;
-  padding: 10px;
-  background: #F2F6FC;
-  text-align: center;
-  font-size: 14px;
-  color: #303133;
-}
+  .table-cell-title {
+    border-right: 1px solid #DCDFE6;
+    border-bottom: 1px solid #DCDFE6;
+    padding: 10px;
+    background: #F2F6FC;
+    text-align: center;
+    font-size: 14px;
+    color: #303133;
+  }
 </style>
