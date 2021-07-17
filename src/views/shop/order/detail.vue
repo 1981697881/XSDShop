@@ -175,8 +175,8 @@
           <template slot-scope="scope">
             ￥{{scope.row.cartInfoMap.truePrice}}
           </template>
-        </el-table-column><!--v-if="order.pinkName=='[预售订单]'"-->
-        <el-table-column label="配送计划" width="100" >
+        </el-table-column>
+        <el-table-column label="配送计划" width="100" v-if="order.pinkName=='[预售订单]'">
           <template slot-scope="scope">
                   <span class="el-tag el-tag--success el-tag--mini" style="cursor: pointer;"
                         @click="psjhChange(scope.row,scope.$index,true)">

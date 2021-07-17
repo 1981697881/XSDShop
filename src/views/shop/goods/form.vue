@@ -43,7 +43,12 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="商品规格：" props="spec_type">
+            <el-form-item label="起送数量：" >
+              <el-input-number v-model="formValidate.startCount"  :min="1" ></el-input-number>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="商品规格：" >
               <el-radio-group v-model="formValidate.spec_type"  @change="changeSpec">
                 <el-radio :label="0" class="radio">单规格</el-radio>
                 <el-radio :label="1">多规格{{formValidate.spec_typ}}</el-radio>
@@ -423,6 +428,7 @@ export default {
         give_integral: 0,
         sort: 0,
         is_show: 1,
+        startCount: 1,
         is_hot: 0,
         is_benefit: 0,
         is_best: 0,
