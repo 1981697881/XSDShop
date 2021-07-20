@@ -40,7 +40,7 @@ service.interceptors.response.use(
       })
       return Promise.reject('error')
     } else {
-      console.log('a:' + response.data.code)
+      console.log('a:' + response.data)
       const data_code = response.data.code || 200
       const msg = errorCode[data_code] || response.data.msg || errorCode['default']
       if (data_code === 401) {

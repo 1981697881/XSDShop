@@ -118,23 +118,56 @@
       destroy-on-close
       append-to-body
     >
-      <el-form :model="form" :rules="rules" ref="form" label-width="80px" :size="'mini'">
-        <el-row :span="24">
-          <el-form-item :label="'优惠券名称'" prop="starName">
-            <el-input v-model="form.starName"></el-input>
-          </el-form-item>
-        </el-row>
-        <el-row :span="24">
-          <el-col :span="24">
-            <el-form-item :label="'个人简介'" prop="starProfile">
-              <el-input type="textarea" v-model="form.starProfile"></el-input>
+      <el-form :model="form" :rules="rules" ref="form" label-width="110px" :size="'mini'">
+        <el-form-item label="优惠券名称">
+          <el-input v-model="form.cname"  :disabled="true" />
+        </el-form-item>
+        <el-form-item label="发布数量">
+          <el-input v-model="form.totalCount"  />
+        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="10">
+            <el-form-item label="手机号码">
+              <el-input v-model="form.starName" placeholder="名称"></el-input>
             </el-form-item>
           </el-col>
-
+          <el-col :span="2">
+            <el-button  :size="'mini'" type="success" @click="query" icon="el-icon-search">查询</el-button>
+          </el-col>
+        </el-row>
+        <el-row :span="20">
+          <div>
+            <span class="font-small">选择人员</span>
+          </div>
+          <el-col :span="24">
+            <el-table class="list-main" height="200px" :data="list" border size="mini" :highlight-current-row="true" @row-click="listClick" >
+              <el-table-column
+                v-for="(t,i) in columns"
+                :key="i"
+                align="center"
+                :prop="t.name"
+                :label="t.text"
+                v-if="t.default!=undefined?t.default:true"
+                :width="t.width?t.width:''"
+              ></el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
+        <div style="margin-top: 20px">
+          <span class="font-small">兑换码</span>
+        </div>
+        <el-row :span="20">
+          <el-col :span="24" style="text-align: center">
+            <el-image
+              style="width: 100px; height: 100px"
+              :src="furl"
+              :preview-src-list="srcList">
+            </el-image>
+          </el-col>
         </el-row>
       </el-form>
       <div slot="footer" style="text-align:center;padding-top: 15px">
-        <el-button type="primary" @click="saveStart('userform')">保存</el-button>
+        <el-button type="primary" @click="handleChange">生成二维码</el-button>
       </div>
     </el-dialog>
   </div>
@@ -146,6 +179,7 @@ import { del } from '@/api/yxStoreCoupon'
 import eForm from './form'
 import eIForm from '../couponissue/form'
 import { formatTime } from '@/utils/index'
+import QRCode from 'qrcodejs2'
 export default {
   components: { eForm, eIForm },
   mixins: [initData],
@@ -153,12 +187,22 @@ export default {
     return {
       delLoading: false,
       visible: false,
+      furl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+      srcList: [
+        'https://fuss10.elemecdn.com/8/27/f01c15bb73e1ef3793e64e6b7bbccjpeg.jpeg',
+      ],
       form: {
         starSex: null,
         starName: null, // 名称
         starProfile: null,
         starPhotoUrl: null,
       },
+      list: [],
+      checkData: {},
+      columns: [
+        {text: "名称", name: "starName"},
+        {text: "手机号码", name: "roleType"},
+      ],
       rules: {
         starName: [
           {required: true, message: '请输入值', trigger: 'blur'},
@@ -179,6 +223,38 @@ export default {
   methods: {
     formatTime,
     checkPermission,
+    creatQrCode(element,val) {
+      var deleteNode =document.getElementById(element).innerText ='';
+      var qrcode = new QRCode(element, {
+        text: val, // 需要转换为二维码的内容
+        width: 100,
+        height: 100,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      })
+    },
+    handleChange(val) {
+      let that = this
+      this.multipleSelection = val;
+      this.$nextTick(() => {
+        this.multipleSelection.forEach((item,index)=>{
+          that.creatQrCode('qrCode'+index,'https://cfzx.gzfzdev.com/groupTicket?exchangeCode='+item.memberCdkeyShare)
+        })
+      })
+    },
+    //查询
+    query(){
+      getStarList(this.qFilter()).then(res => {
+        if (res.flag) {
+          this.list2 = res.data
+        }
+      })
+    },
+    //列表表选中
+    listClick(obj){
+      this.checkData = obj
+    },
     beforeInit() {
       this.url = 'mall/yxStoreCoupon'
       const sort = 'id,desc'

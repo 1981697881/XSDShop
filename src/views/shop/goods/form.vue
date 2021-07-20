@@ -775,7 +775,6 @@ export default {
           cssRules: 'width:1200px;height:500px;padding:20px;'
         });
         this.dialog = dialog;
-
         var btn = new window.UE.ui.Button({
           name: 'dialog-button',
           title: '上传图片',

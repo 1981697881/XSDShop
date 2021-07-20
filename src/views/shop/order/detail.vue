@@ -617,15 +617,15 @@
       psjhChange(row, index, cg){
         this.visible = true
         getPSPlan(id).then(response => {
-          this.list = response.data;
-          this.userDTO = this.order.userDTO;
         });
       },
       saveStart(row, index, cg){
-        this.visible = true
-        addPSPlan(id).then(response => {
-          this.order = response;
-          this.userDTO = this.order.userDTO;
+
+        addPSPlan(id).then(res => {
+          if(res.flag){
+            this.visible = false
+          }
+
         });
       },
       changeDate(val, row) {
