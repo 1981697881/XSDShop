@@ -7,7 +7,13 @@ export function add(data) {
     data
   })
 }
-
+export function getUserList(data) {
+  return request({
+    url: 'mall/yxUserList',
+    method: 'get',
+    data
+  })
+}
 export function del(uid) {
   return request({
     url: 'mall/yxUser/' + uid,

@@ -123,16 +123,16 @@
           <el-input v-model="form.cname"  :disabled="true" />
         </el-form-item>
         <el-form-item label="发布数量">
-          <el-input v-model="form.totalCount"  />
+          <el-input v-model="form.totalCount"  :disabled="true"/>
         </el-form-item>
         <el-row :gutter="20">
-          <el-col :span="10">
+          <el-col :span="18">
             <el-form-item label="手机号码">
-              <el-input v-model="form.starName" placeholder="名称"></el-input>
+              <el-input v-model="queryPhone" placeholder="名称"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="2">
-            <el-button  :size="'mini'" type="success" @click="query" icon="el-icon-search">查询</el-button>
+            <el-button :size="'mini'" type="success" @click="searchUser" icon="el-icon-search">查询</el-button>
           </el-col>
         </el-row>
         <el-row :span="20">
@@ -153,21 +153,14 @@
             </el-table>
           </el-col>
         </el-row>
-        <div style="margin-top: 20px">
-          <span class="font-small">兑换码</span>
+        <div style="margin-top: 20px;text-align: center">
+          <div class="font-small">兑换码</div>
+          <div class="scanImg" id="qrCode"></div>
         </div>
-        <el-row :span="20">
-          <el-col :span="24" style="text-align: center">
-            <el-image
-              style="width: 100px; height: 100px"
-              :src="furl"
-              :preview-src-list="srcList">
-            </el-image>
-          </el-col>
-        </el-row>
       </el-form>
       <div slot="footer" style="text-align:center;padding-top: 15px">
         <el-button type="primary" @click="handleChange">生成二维码</el-button>
+        <el-button type="success" @click="down">下载</el-button>
       </div>
     </el-dialog>
   </div>
@@ -180,6 +173,9 @@ import eForm from './form'
 import eIForm from '../couponissue/form'
 import { formatTime } from '@/utils/index'
 import QRCode from 'qrcodejs2'
+import {
+  getUserList
+} from '@/api/yxUser'
 export default {
   components: { eForm, eIForm },
   mixins: [initData],
@@ -187,10 +183,6 @@ export default {
     return {
       delLoading: false,
       visible: false,
-      furl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-      srcList: [
-        'https://fuss10.elemecdn.com/8/27/f01c15bb73e1ef3793e64e6b7bbccjpeg.jpeg',
-      ],
       form: {
         starSex: null,
         starName: null, // 名称
@@ -198,6 +190,7 @@ export default {
         starPhotoUrl: null,
       },
       list: [],
+      queryPhone: '',
       checkData: {},
       columns: [
         {text: "名称", name: "starName"},
@@ -236,18 +229,38 @@ export default {
     },
     handleChange(val) {
       let that = this
-      this.multipleSelection = val;
-      this.$nextTick(() => {
-        this.multipleSelection.forEach((item,index)=>{
-          that.creatQrCode('qrCode'+index,'https://cfzx.gzfzdev.com/groupTicket?exchangeCode='+item.memberCdkeyShare)
-        })
-      })
+      that.creatQrCode('qrCode','123')
+    },
+    down() { // 保存二维码
+      var oQrcode = document.querySelectorAll('#qrCode img')
+      var url = oQrcode[0].src
+      this.downloadIamge(url, '二维码')
+    },
+    downloadIamge (imgsrc, name) { // 下载图片地址和图片名
+      var image = new Image()
+      // 解决跨域 Canvas 污染问题
+      image.setAttribute('crossOrigin', 'anonymous')
+      image.onload = function () {
+        var canvas = document.createElement('canvas')
+        canvas.width = image.width
+        canvas.height = image.height
+        var context = canvas.getContext('2d')
+        context.drawImage(image, 0, 0, image.width, image.height)
+        var url = canvas.toDataURL('image/png') // 得到图片的base64编码数据
+        var a = document.createElement('a') // 生成一个a元素
+        var event = new MouseEvent('click') // 创建一个单击事件
+        a.download = name || 'photo' // 设置图片名称
+        a.href = url // 将生成的URL设置为a.href属性
+        a.dispatchEvent(event) // 触发a的单击事件
+      }
+      image.src = imgsrc
     },
     //查询
-    query(){
-      getStarList(this.qFilter()).then(res => {
-        if (res.flag) {
-          this.list2 = res.data
+    searchUser(){
+      console.log({phone: this.queryPhone})
+      getUserList({phone: this.queryPhone}).then(res => {
+        if (res.length>0) {
+          this.list = res
         }
       })
     },
@@ -276,7 +289,6 @@ export default {
       }).catch(err => {
         this.delLoading = false
         this.$refs[id].doClose()
-        console.log(err.response.data.message)
       })
     },
     add() {
@@ -306,6 +318,17 @@ export default {
       console.log(data)
       if(data.getLimit==2){
         this.visible = true
+        this.form = {
+          cid: data.id,
+          cname: data.title,
+          ctype: data.type,
+          getLimit: data.getLimit,
+          isPermanent: 0,
+          status: 1,
+          totalCount: 1,
+          remainCount: 0,
+          isDel: 0
+        }
       }else{
         this.isAdd = true
         const _this = this.$refs.form2
@@ -328,5 +351,8 @@ export default {
 </script>
 
 <style scoped>
-
+  .scanImg{
+    display: inline-block;
+    margin-top: 20px
+  }
 </style>

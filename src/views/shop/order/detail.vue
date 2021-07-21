@@ -406,7 +406,7 @@
             >
               <template slot-scope="scope">
                 <span v-if="scope.row.isSet">
-                  <div class="block" v-if="t.name == 'routeNo'">
+                  <div class="block" v-if="t.name == 'putDate'">
                   <el-date-picker
                     @change="changeDate($event,sel)"
                     v-model="sel[t.name]"
@@ -417,7 +417,7 @@
                     placeholder="选择日期">
                   </el-date-picker>
                 </div>
-                   <el-input-number size="mini" v-else-if="t.name == 'orderNo'" placeholder="请输入内容"
+                   <el-input-number size="mini" v-else-if="t.name == 'putCount'" placeholder="请输入内容"
                                     v-model="sel[t.name]">
                   </el-input-number>
                    <span v-else>{{sel[t.name]}}</span>
@@ -432,7 +432,7 @@
                     {{scope.row.isSet?'确定':"修改"}}
                   </span>
                 <span v-if="!scope.row.isSet" class="el-tag el-tag--danger el-tag--mini"
-                      @click="deleteRow(scope.$index,list)" style="cursor: pointer;">
+                      @click="deleteRow(scope.row,scope.$index,list)" style="cursor: pointer;">
                     删除
                   </span>
                 <span v-else class="el-tag  el-tag--mini" style="cursor: pointer;"
@@ -457,8 +457,9 @@
 <script>
   import {
     express, getOrderDetail,
-    getNowOrderStatus,getPSPlan,addPSPlan
+    getNowOrderStatus, getPSPlan, addPSPlan
   } from '@/api/yxStoreOrder'
+
   import {formatTimeTwo} from '@/utils/index';
   import eForm from './form'
   import eRefund from './refund'
@@ -494,13 +495,13 @@
         id: null,
         sel: null, // 选中行
         list: [],
+        cIndex: 0,
         columns: [
           {text: "id", name: "id", default: false},
-          {text: "配送日期", name: "routeNo"},
-          {text: "配送数量", name: "orderNo"},
+          {text: "配送日期", name: "putDate"},
+          {text: "配送数量", name: "putCount"},
         ],
-        rules: {
-        },
+        rules: {},
         order: {},
         form: {},
         user: {},
@@ -614,22 +615,29 @@
       this.init();
     },
     methods: {
-      psjhChange(row, index, cg){
-        this.visible = true
-        getPSPlan(id).then(response => {
+      psjhChange(row, index, cg) {
+        this.planProductId = row.cartInfoMap.productId
+        getPSPlan({productId: row.cartInfoMap.productId, orderId: this.order.orderId}).then(res => {
+          console.log(res.length)
+          if (res.length > 0) {
+            this.list = res
+          }
+          this.visible = true
         });
       },
-      saveStart(row, index, cg){
-
-        addPSPlan(id).then(res => {
-          if(res.flag){
+      saveStart() {
+        addPSPlan(this.list).then(res => {
+          if(res.success){
+            this.$message({
+              type: 'success',
+              message: res.msg
+            });
             this.visible = false
           }
-
         });
       },
       changeDate(val, row) {
-        this.$set(row, 'routeNo', val)
+        this.$set(row, 'putDate', val)
       },
       //读取表格数据
       readMasterUser() {
@@ -656,7 +664,7 @@
         //提交数据
         if (row.isSet) {
           const sel = this.sel
-          if ((sel.routeNo == null || sel.routeNo === '') || (sel.orderNo == null || sel.orderNo === '')) {
+          if ((sel.putDate == null || sel.putDate === '') || (sel.putCount == null || sel.putCount === '')) {
             return this.$message({
               type: 'error',
               message: "请输入必填项!"
@@ -679,13 +687,6 @@
       },
       //删除带确认区 单行删除
       deleteRow(row, index, rows) {
-        this.result.forEach((item, index2) => {
-          if (row.processRouteDetailId == item) {
-            this.result.splice(index2, 1);
-          }
-        })
-        console.log(this.result)
-        console.log(row)
         rows.splice(index, 1);
       },
       //添加
@@ -693,8 +694,9 @@
         for (let i of this.list) {
           if (i.isSet) return this.$message.warning("请先保存当前编辑项");
         }
-        this.cIndex += 10
-        let j = {isSet: true, orderNo: this.cIndex, routeNo: '', orderNo: ''};
+        this.cIndex += 1
+        let j = {isSet: true, cIndex: this.cIndex, orderId: this.order.orderId, productId: this.planProductId};
+        console.log(j)
         this.list.push(j);
         this.sel = JSON.parse(JSON.stringify(j));
       },
