@@ -7,6 +7,22 @@ export function add(data) {
     data
   })
 }
+//指定人员优惠券
+export function couponIssueGetLimit(data) {
+  return request({
+    url: 'mall/yxStoreCouponIssueGetLimit',
+    method: 'post',
+    data
+  })
+}
+//指定人员已发送优惠券
+export function getCouponIssueGetLimit(data) {
+  return request({
+    url: 'mall/getYxStoreCouponIssueGetLimit',
+    method: 'get',
+    params: data
+  })
+}
 
 export function del(id) {
   return request({

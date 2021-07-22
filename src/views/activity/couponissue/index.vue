@@ -10,6 +10,13 @@
         icon="el-icon-refresh"
         @click="toQuery"
       >刷新</el-button>
+      <el-button
+        type="primary"
+        class="filter-item"
+        size="mini"
+        icon="el-icon-refresh"
+        @click="getCoupon"
+      >指定人员优惠券</el-button>
     </div>
     <!--表单组件-->
     <eForm ref="form" :is-add="isAdd" />
@@ -73,6 +80,56 @@
       @size-change="sizeChange"
       @current-change="pageChange"
     />
+    <el-dialog
+      :visible.sync="visible"
+      title="特定人员优惠券"
+      v-if="visible"
+      :width="'30%'"
+      destroy-on-close
+      append-to-body
+    >
+      <el-form :model="form"  ref="form" label-width="110px" :size="'mini'">
+       <!-- <el-form-item label="优惠券名称">
+          <el-input v-model="form.cname" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="发布数量">
+          <el-input v-model="form.totalCount" :disabled="true"/>
+        </el-form-item>-->
+        <el-row :gutter="20">
+          <el-col :span="18">
+            <el-form-item label="手机号码">
+              <el-input v-model="queryPhone" placeholder="名称"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="2">
+            <el-button :size="'mini'" type="success" @click="searchUser" icon="el-icon-search">查询</el-button>
+          </el-col>
+        </el-row>
+        <el-row :span="20">
+          <el-col :span="24">
+            <el-table class="list-main" height="200px" :data="list" border size="mini" :highlight-current-row="true"
+                      @row-click="listClick">
+              <el-table-column
+                v-for="(t,i) in columns"
+                :key="i"
+                align="center"
+                :prop="t.name"
+                :label="t.text"
+                v-if="t.default!=undefined?t.default:true"
+                :width="t.width?t.width:''"
+              ></el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
+        <div style="margin-top: 20px;text-align: center">
+          <div class="font-small">兑换码</div>
+          <div class="scanImg" id="qruCode"></div>
+        </div>
+      </el-form>
+      <div slot="footer" style="text-align:center;padding-top: 15px">
+        <el-button type="success" @click="down">下载</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -82,11 +139,20 @@ import initData from '@/mixins/crud'
 import { del } from '@/api/yxStoreCouponIssue'
 import eForm from './formt'
 import { formatTimeTwo } from '@/utils/index'
+import { getCouponIssueGetLimit } from '@/api/yxStoreCouponIssue'
 export default {
   components: { eForm },
   mixins: [initData],
   data() {
     return {
+      visible: false,
+      queryPhone: '',
+      list: [],
+      columns: [
+        {text: "优惠券", name: "cname"},
+        {text: "名称", name: "nickName"},
+        {text: "手机号码", name: "phone"},
+      ],
       delLoading: false
     }
   },
@@ -98,6 +164,37 @@ export default {
   methods: {
     formatTimeTwo,
     checkPermission,
+    getCoupon(){
+      this.visible = true
+    },
+    creatQrCode(element, val) {
+      var deleteNode = document.getElementById(element).innerText = '';
+      var qruCode = new QRCode(element, {
+        text: val, // 需要转换为二维码的内容
+        width: 100,
+        height: 100,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      })
+    },
+    listClick(obj) {
+      let that = this
+      that.creatQrCode('qruCode', obj.row.qrCode+"?pageType=coupon")
+    },
+    down() { // 保存二维码
+      var oQrcode = document.querySelectorAll('#qruCode img')
+      var url = oQrcode[0].src
+      this.downloadIamge(url, '二维码')
+    },
+    //查询
+    searchUser() {
+      getCouponIssueGetLimit({phone: this.queryPhone}).then(res => {
+        if (res.length > 0) {
+          this.list = res
+        }
+      })
+    },
     beforeInit() {
       this.url = 'mall/yxStoreCouponIssue'
       const sort = 'id,desc'

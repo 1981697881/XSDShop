@@ -11,7 +11,7 @@ export function getUserList(data) {
   return request({
     url: 'mall/yxUserList',
     method: 'get',
-    data
+    params: data
   })
 }
 export function del(uid) {

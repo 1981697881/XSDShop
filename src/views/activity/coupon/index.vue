@@ -11,16 +11,17 @@
           type="primary"
           icon="el-icon-plus"
           @click="add"
-        >新增</el-button>
+        >新增
+        </el-button>
       </div>
     </div>
     <!--表单组件-->
-    <eForm ref="form" :is-add="isAdd" />
-    <eIForm ref="form2" :is-add="isAdd" />
+    <eForm ref="form" :is-add="isAdd"/>
+    <eIForm ref="form2" :is-add="isAdd"/>
     <!--表格渲染-->
     <el-table v-loading="loading" :data="data" size="small" style="width: 100%;">
       <!--<el-table-column prop="id" label="ID"/>-->
-      <el-table-column prop="title" label="优惠券名称" />
+      <el-table-column prop="title" label="优惠券名称"/>
       <el-table-column prop="type" label="优惠券类型">
         <template slot-scope="scope">
           <div>
@@ -32,20 +33,20 @@
       <el-table-column prop="type" label="发送限制">
         <template slot-scope="scope">
           <div>
-            <el-tag v-if="scope.row.getLimit === 0"  :type="'success'">全员发放</el-tag>
-            <el-tag v-else-if="scope.row.getLimit === 1"  :type="'danger'">新用户</el-tag>
+            <el-tag v-if="scope.row.getLimit === 0" :type="'success'">全员发放</el-tag>
+            <el-tag v-else-if="scope.row.getLimit === 1" :type="'danger'">新用户</el-tag>
             <el-tag v-else :type="'info' ">特定人员</el-tag>
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="couponPrice" label="优惠券面值" />
-      <el-table-column prop="useMinPrice" label="优惠券最低消费" />
+      <el-table-column prop="couponPrice" label="优惠券面值"/>
+      <el-table-column prop="useMinPrice" label="优惠券最低消费"/>
       <el-table-column label="优惠券有效期限">
         <template slot-scope="scope">
           <span>{{ scope.row.couponTime }}天</span>
         </template>
       </el-table-column>
-      <el-table-column prop="sort" label="排序" width="100" />
+      <el-table-column prop="sort" label="排序" width="100"/>
       <el-table-column label="状态" width="100" align="center">
         <template slot-scope="scope">
           <div>
@@ -59,7 +60,8 @@
           <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="checkPermission(['admin','YXSTORECOUPON_ALL','YXSTORECOUPON_EDIT','YXSTORECOUPON_DELETE'])" width="200" label="操作" align="center">
+      <el-table-column v-if="checkPermission(['admin','YXSTORECOUPON_ALL','YXSTORECOUPON_EDIT','YXSTORECOUPON_DELETE'])"
+                       width="200" label="操作" align="center">
         <template slot-scope="scope">
           <el-button
             v-permission="['admin','YXSTORECOUPON_ALL','YXSTORECOUPON_EDIT']"
@@ -79,7 +81,8 @@
                   type="primary"
                   icon="el-icon-edit"
                   @click="edit(scope.row)"
-                >编辑</el-button>
+                >编辑
+                </el-button>
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-popover
@@ -91,7 +94,8 @@
                   <p>确定删除本条数据吗？</p>
                   <div style="text-align: right; margin: 0">
                     <el-button size="mini" type="text" @click="$refs[scope.row.id].doClose()">取消</el-button>
-                    <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.id)">确定</el-button>
+                    <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.id)">确定
+                    </el-button>
                   </div>
                   <el-button slot="reference" type="danger" icon="el-icon-delete" size="mini">删除</el-button>
                 </el-popover>
@@ -120,10 +124,10 @@
     >
       <el-form :model="form" :rules="rules" ref="form" label-width="110px" :size="'mini'">
         <el-form-item label="优惠券名称">
-          <el-input v-model="form.cname"  :disabled="true" />
+          <el-input v-model="form.cname" :disabled="true"/>
         </el-form-item>
         <el-form-item label="发布数量">
-          <el-input v-model="form.totalCount"  :disabled="true"/>
+          <el-input v-model="form.totalCount" :disabled="true"/>
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="18">
@@ -140,7 +144,8 @@
             <span class="font-small">选择人员</span>
           </div>
           <el-col :span="24">
-            <el-table class="list-main" height="200px" :data="list" border size="mini" :highlight-current-row="true" @row-click="listClick" >
+            <el-table class="list-main" height="200px" :data="list" border size="mini" :highlight-current-row="true"
+                      @row-click="listClick">
               <el-table-column
                 v-for="(t,i) in columns"
                 :key="i"
@@ -166,192 +171,212 @@
   </div>
 </template>
 <script>
-import checkPermission from '@/utils/permission'
-import initData from '@/mixins/crud'
-import { del } from '@/api/yxStoreCoupon'
-import eForm from './form'
-import eIForm from '../couponissue/form'
-import { formatTime } from '@/utils/index'
-import QRCode from 'qrcodejs2'
-import {
-  getUserList
-} from '@/api/yxUser'
-export default {
-  components: { eForm, eIForm },
-  mixins: [initData],
-  data() {
-    return {
-      delLoading: false,
-      visible: false,
-      form: {
-        starSex: null,
-        starName: null, // 名称
-        starProfile: null,
-        starPhotoUrl: null,
-      },
-      list: [],
-      queryPhone: '',
-      checkData: {},
-      columns: [
-        {text: "名称", name: "starName"},
-        {text: "手机号码", name: "roleType"},
-      ],
-      rules: {
-        starName: [
-          {required: true, message: '请输入值', trigger: 'blur'},
-        ],starProfile: [
-          {required: true, message: '请输入值', trigger: 'blur'},
+  import checkPermission from '@/utils/permission'
+  import initData from '@/mixins/crud'
+  import {del} from '@/api/yxStoreCoupon'
+  import eForm from './form'
+  import eIForm from '../couponissue/form'
+  import {formatTime} from '@/utils/index'
+  import QRCode from 'qrcodejs2'
+  import {
+    getUserList
+  } from '@/api/yxUser'
+  import {couponIssueGetLimit} from '@/api/yxStoreCouponIssue'
+
+  export default {
+    components: {eForm, eIForm},
+    mixins: [initData],
+    data() {
+      return {
+        delLoading: false,
+        visible: false,
+        form: {
+          starSex: null,
+          starName: null, // 名称
+          starProfile: null,
+          starPhotoUrl: null,
+        },
+        list: [],
+        queryPhone: '',
+        checkData: {},
+        columns: [
+          {text: "名称", name: "nickname"},
+          {text: "手机号码", name: "phone"},
         ],
-        starSex: [
-          {required: true, message: '请选择', trigger: 'change'}
-        ],
-      },
-    }
-  },
-  created() {
-    this.$nextTick(() => {
-      this.init()
-    })
-  },
-  methods: {
-    formatTime,
-    checkPermission,
-    creatQrCode(element,val) {
-      var deleteNode =document.getElementById(element).innerText ='';
-      var qrcode = new QRCode(element, {
-        text: val, // 需要转换为二维码的内容
-        width: 100,
-        height: 100,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H
-      })
-    },
-    handleChange(val) {
-      let that = this
-      that.creatQrCode('qrCode','123')
-    },
-    down() { // 保存二维码
-      var oQrcode = document.querySelectorAll('#qrCode img')
-      var url = oQrcode[0].src
-      this.downloadIamge(url, '二维码')
-    },
-    downloadIamge (imgsrc, name) { // 下载图片地址和图片名
-      var image = new Image()
-      // 解决跨域 Canvas 污染问题
-      image.setAttribute('crossOrigin', 'anonymous')
-      image.onload = function () {
-        var canvas = document.createElement('canvas')
-        canvas.width = image.width
-        canvas.height = image.height
-        var context = canvas.getContext('2d')
-        context.drawImage(image, 0, 0, image.width, image.height)
-        var url = canvas.toDataURL('image/png') // 得到图片的base64编码数据
-        var a = document.createElement('a') // 生成一个a元素
-        var event = new MouseEvent('click') // 创建一个单击事件
-        a.download = name || 'photo' // 设置图片名称
-        a.href = url // 将生成的URL设置为a.href属性
-        a.dispatchEvent(event) // 触发a的单击事件
+        rules: {
+          starName: [
+            {required: true, message: '请输入值', trigger: 'blur'},
+          ], starProfile: [
+            {required: true, message: '请输入值', trigger: 'blur'},
+          ],
+          starSex: [
+            {required: true, message: '请选择', trigger: 'change'}
+          ],
+        },
       }
-      image.src = imgsrc
     },
-    //查询
-    searchUser(){
-      console.log({phone: this.queryPhone})
-      getUserList({phone: this.queryPhone}).then(res => {
-        if (res.length>0) {
-          this.list = res
-        }
-      })
-    },
-    //列表表选中
-    listClick(obj){
-      this.checkData = obj
-    },
-    beforeInit() {
-      this.url = 'mall/yxStoreCoupon'
-      const sort = 'id,desc'
-      this.params = { page: this.page, size: this.size, sort: sort, isDel: 0 }
-      return true
-    },
-    subDelete(id) {
-      this.delLoading = true
-      del(id).then(res => {
-        this.delLoading = false
-        this.$refs[id].doClose()
-        this.dleChangePage()
+    created() {
+      this.$nextTick(() => {
         this.init()
-        this.$notify({
-          title: '删除成功',
-          type: 'success',
-          duration: 2500
-        })
-      }).catch(err => {
-        this.delLoading = false
-        this.$refs[id].doClose()
       })
     },
-    add() {
-      this.isAdd = true
-      this.$refs.form.dialog = true
-    },
-    edit(data) {
-      this.isAdd = false
-      const _this = this.$refs.form
-      _this.form = {
-        id: data.id,
-        title: data.title,
-        integral: data.integral,
-        getLimit: data.getLimit,
-        couponPrice: data.couponPrice,
-        useMinPrice: data.useMinPrice,
-        couponTime: data.couponTime,
-        sort: data.sort,
-        status: data.status,
-        type: data.type,
-        productId: data.productId,
-        product: data.product
-      }
-      _this.dialog = true
-    },
-    edit2(data) {
-      console.log(data)
-      if(data.getLimit==2){
-        this.visible = true
-        this.form = {
-          cid: data.id,
-          cname: data.title,
-          ctype: data.type,
-          getLimit: data.getLimit,
-          isPermanent: 0,
-          status: 1,
-          totalCount: 1,
-          remainCount: 0,
-          isDel: 0
+    methods: {
+      formatTime,
+      checkPermission,
+      creatQrCode(element, val) {
+        var deleteNode = document.getElementById(element).innerText = '';
+        var qrcode = new QRCode(element, {
+          text: val, // 需要转换为二维码的内容
+          width: 100,
+          height: 100,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        })
+      },
+      handleChange(val) {
+        let that = this
+        let form = {...this.form}
+        form.uid = that.checkData.uid
+        if(that.checkData.uid){
+          couponIssueGetLimit(form).then(res => {
+            that.creatQrCode('qrCode', res+"?pageType=coupon")
+            this.$notify({
+              title: '生成成功',
+              type: 'success',
+              duration: 2500
+            })
+          })
+        }else{
+          this.$notify({
+            title: '请选择用户',
+            type: 'error',
+            duration: 2500
+          })
         }
-      }else{
+      },
+      down() { // 保存二维码
+        var oQrcode = document.querySelectorAll('#qrCode img')
+        var url = oQrcode[0].src
+        this.downloadIamge(url, '二维码')
+      },
+      downloadIamge(imgsrc, name) { // 下载图片地址和图片名
+        var image = new Image()
+        // 解决跨域 Canvas 污染问题
+        image.setAttribute('crossOrigin', 'anonymous')
+        image.onload = function () {
+          var canvas = document.createElement('canvas')
+          canvas.width = image.width
+          canvas.height = image.height
+          var context = canvas.getContext('2d')
+          context.drawImage(image, 0, 0, image.width, image.height)
+          var url = canvas.toDataURL('image/png') // 得到图片的base64编码数据
+          var a = document.createElement('a') // 生成一个a元素
+          var event = new MouseEvent('click') // 创建一个单击事件
+          a.download = name || 'photo' // 设置图片名称
+          a.href = url // 将生成的URL设置为a.href属性
+          a.dispatchEvent(event) // 触发a的单击事件
+        }
+        image.src = imgsrc
+      },
+      //查询
+      searchUser() {
+        getUserList({phone: this.queryPhone}).then(res => {
+          if (res.length > 0) {
+            this.list = res
+          }
+        })
+      },
+      //列表表选中
+      listClick(obj) {
+        this.checkData = obj
+      },
+      beforeInit() {
+        this.url = 'mall/yxStoreCoupon'
+        const sort = 'id,desc'
+        this.params = {page: this.page, size: this.size, sort: sort, isDel: 0}
+        return true
+      },
+      subDelete(id) {
+        this.delLoading = true
+        del(id).then(res => {
+          this.delLoading = false
+          this.$refs[id].doClose()
+          this.dleChangePage()
+          this.init()
+          this.$notify({
+            title: '删除成功',
+            type: 'success',
+            duration: 2500
+          })
+        }).catch(err => {
+          this.delLoading = false
+          this.$refs[id].doClose()
+        })
+      },
+      add() {
         this.isAdd = true
-        const _this = this.$refs.form2
+        this.$refs.form.dialog = true
+      },
+      edit(data) {
+        this.isAdd = false
+        const _this = this.$refs.form
         _this.form = {
-          cid: data.id,
-          cname: data.title,
-          ctype: data.type,
+          id: data.id,
+          title: data.title,
+          integral: data.integral,
           getLimit: data.getLimit,
-          isPermanent: 0,
-          status: 1,
-          totalCount: 0,
-          remainCount: 0,
-          isDel: 0
+          couponPrice: data.couponPrice,
+          useMinPrice: data.useMinPrice,
+          couponTime: data.couponTime,
+          sort: data.sort,
+          status: data.status,
+          type: data.type,
+          productId: data.productId,
+          product: data.product
         }
         _this.dialog = true
+      },
+      edit2(data) {
+        if (data.getLimit == 2) {
+          this.visible = true
+          this.form = {
+            cid: data.id,
+            cname: data.title,
+            ctype: data.type,
+            getLimit: data.getLimit,
+            isPermanent: 0,
+            status: 1,
+            totalCount: 1,
+            remainCount: 0,
+            isDel: 0
+          }
+          this.list = []
+          this.queryPhone = ''
+          this.checkData = {}
+        } else {
+          this.isAdd = true
+          const _this = this.$refs.form2
+          _this.form = {
+            cid: data.id,
+            cname: data.title,
+            ctype: data.type,
+            getLimit: data.getLimit,
+            isPermanent: 0,
+            status: 1,
+            totalCount: 0,
+            remainCount: 0,
+            isDel: 0
+          }
+          _this.dialog = true
+        }
       }
     }
   }
-}
 </script>
 
 <style scoped>
-  .scanImg{
+  .scanImg {
     display: inline-block;
     margin-top: 20px
   }
