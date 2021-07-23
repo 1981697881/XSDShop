@@ -9,6 +9,11 @@
               <el-input v-model="formValidate.store_name" placeholder="请输入商品名称"  />
             </el-form-item>
           </el-col>
+          <el-col>
+            <el-form-item label="二级名称：">
+              <el-input v-model="formValidate.productText" placeholder="请输入商品名称"  />
+            </el-form-item>
+          </el-col>
           <el-col v-bind="grid2">
             <el-form-item label="商品分类：" prop="cate_id">
               <el-select v-model="formValidate.cate_id" filterable :filter-method="dataFilter" clearable>
@@ -429,6 +434,7 @@ export default {
         sort: 0,
         is_show: 1,
         startCount: 1,
+        productText: '',
         is_hot: 0,
         is_benefit: 0,
         is_best: 0,
