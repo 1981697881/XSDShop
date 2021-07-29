@@ -21,7 +21,7 @@
       <el-table-column prop="id" label="ID" />
       <el-table-column prop="map.info" label="滚动文字" />
       <el-table-column prop="map.url" label="链接url" />
-      <el-table-column prop="map.uniapp_url" label="uniapp路由" />
+      <el-table-column prop="map.uniapp_url" label="内部链接" />
       <el-table-column prop="sort" label="排序" />
       <el-table-column label="状态" align="center">
         <template slot-scope="scope">

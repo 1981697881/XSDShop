@@ -21,7 +21,7 @@
       <el-table-column prop="id" label="ID" />
       <el-table-column prop="map.name" label="菜单名" />
       <el-table-column prop="map.url" label="链接url" />
-      <el-table-column prop="map.uniapp_url" label="uniapp路由" />
+      <el-table-column prop="map.uniapp_url" label="内部链接" />
       <el-table-column ref="table" label="图标">
         <template slot-scope="scope">
           <a :href="scope.row.map.pic" style="color: #42b983" target="_blank">

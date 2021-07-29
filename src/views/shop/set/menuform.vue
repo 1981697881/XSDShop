@@ -4,11 +4,16 @@
       <el-form-item label="分类名称">
         <el-input v-model="form.name" style="width: 300px;" />
       </el-form-item>
-      <el-form-item label="跳转url">
+     <!-- <el-form-item label="跳转url">
         <el-input v-model="form.url" style="width: 300px;" />
-      </el-form-item>
-      <el-form-item label="uniapp路由">
+      </el-form-item>-->
+      <!--<el-form-item label="内部链接">
         <el-input v-model="form.uniapp_url" style="width: 300px;" />
+      </el-form-item>-->
+      <el-form-item :label="'内部链接'">
+        <el-select v-model="form.uniapp_url" class="width-full" placeholder="请选择">
+          <el-option :label="t[0]" :value="t[1]" v-for="(t,i) in levelFormat" :key="i"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="分类图标(90*90)">
         <MaterialList v-model="form.imageArr" style="width: 300px" type="image" :num="1" :width="150" :height="150" />
@@ -56,7 +61,22 @@ export default {
         sort: 0,
         status: 1
       },
+      levelFormat: [
+        ['全部商品', '/pages/shop/GoodsList/index?type=1'],
+        ['心水达首页', '/pages/delivery/index/index'],
+        ['我的快递', '/pages/delivery/my-courier/my-courier'],
+        ['我要寄件', '/pages/delivery/send-delivery/send-delivery'],
+        ['我的寄件', '/pages/delivery/my-delivery/my-delivery '],
+        ['鲜奶到家', '/pages/shop/GoodsList/index?type=2'],
+        ['30分钟达', '/pages/shop/JSD/menu'],
+        ['优惠券', '/pages/user/coupon/GetCoupon/index'],
+        ['拼团专区', '/pages/activity/GoodsGroup/index'],
+        ['砍价专区', '/pages/activity/GoodsBargain/index'],
+        ['秒杀专区', '/pages/activity/GoodsSeckill/index'],
+        ['满减专区', '/pages/activity/fullReduction/list'],
+        ['积分商城', '/pages/shop/GoodsList/index?title=积分商城&isIntegral=true&?type=0']],
       rules: {
+
       }
     }
   },

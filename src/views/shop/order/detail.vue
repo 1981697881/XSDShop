@@ -180,7 +180,7 @@
           <template slot-scope="scope">
                   <span class="el-tag el-tag--success el-tag--mini" style="cursor: pointer;"
                         @click="psjhChange(scope.row,scope.$index,true)">
-                 编辑
+                 配送计划
                   </span>
           </template>
         </el-table-column>
@@ -616,9 +616,11 @@
     },
     methods: {
       psjhChange(row, index, cg) {
+        this.list = []
         this.planProductId = row.cartInfoMap.productId
+        this.cartNum = row.cartInfoMap.cartNum
+        console.log(row)
         getPSPlan({productId: row.cartInfoMap.productId, orderId: this.order.orderId}).then(res => {
-          console.log(res.length)
           if (res.length > 0) {
             this.list = res
           }
@@ -626,6 +628,7 @@
         });
       },
       saveStart() {
+        this.list[0].allCount = this.cartNum
         addPSPlan(this.list).then(res => {
           if(res.success){
             this.$message({
@@ -633,6 +636,11 @@
               message: res.msg
             });
             this.visible = false
+          }else{
+            this.$message({
+              type: 'error',
+              message: res.msg
+            });
           }
         });
       },
