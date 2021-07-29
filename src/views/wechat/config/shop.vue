@@ -1,13 +1,13 @@
 <template>
   <div class="app-container">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="150px">
-      <el-form-item label="移动端H5地址">
+      <!--<el-form-item label="移动端H5地址">
         <el-input v-model="form.site_url" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="uniapp-H5地址">
         <el-input v-model="form.uni_site_url" style="width: 370px;" />
         <span style="color: red">主要用于兼容单独h5</span>
-      </el-form-item>
+      </el-form-item>-->
       <el-form-item label="移动端API地址">
         <el-input v-model="form.api_url" style="width: 370px;" />
       </el-form-item>
@@ -21,6 +21,10 @@
       <el-form-item label="包邮金额">
         <el-input v-model="form.store_free_postage" style="width: 370px;" />
         <p style="color: red">如果设置满包邮0 表示全局包邮，如果设置大于0表示满这价格包邮，否则走运费模板算法</p>
+      </el-form-item>
+      <el-form-item label="起送金额">
+        <el-input v-model="form.store_free_postage" style="width: 370px;" />
+        <p style="color: red">如果设置起送金额,极速达下单需满起送金额才可下单</p>
       </el-form-item>
       <el-form-item label="隐藏充值按钮">
         <el-radio v-model="form.yshop_show_recharge" :label="0">显示</el-radio>

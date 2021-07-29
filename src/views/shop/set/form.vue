@@ -106,9 +106,15 @@ export default {
     getGoods(p) {
       var ids = []
       p.forEach((item,index) => {
-        ids.push(item.id)
+        ids.push(item)
       })
-        this.form.uniapp_url = '/pages/shop/GoodsCon/index?id='+ids[0]+'&type=1&isIntegral=false'
+      if(ids[0].isIntegral == 0){
+        this.form.uniapp_url = '/pages/shop/GoodsCon/index?id='+ids[0].id+'&type=1&isIntegral=false'
+      }else if(ids[0].isIntegral == 2){
+        this.form.uniapp_url = '/pages/shop/GoodsCon/index?id='+ids[0].id+'&type=2&isIntegral=false'
+      }else if(ids[0].isIntegral == 1){
+        this.form.uniapp_url = '/pages/shop/GoodsCon/index?id='+ids[0].id+'&isIntegral=true'
+      }
     },
     cancel() {
       this.resetForm()
