@@ -23,7 +23,7 @@
         <p style="color: red">如果设置满包邮0 表示全局包邮，如果设置大于0表示满这价格包邮，否则走运费模板算法</p>
       </el-form-item>
       <el-form-item label="起送金额">
-        <el-input v-model="form.store_free_postage" style="width: 370px;" />
+        <el-input v-model="form.start_delivery_count" style="width: 370px;" />
         <p style="color: red">如果设置起送金额,极速达下单需满起送金额才可下单</p>
       </el-form-item>
       <el-form-item label="隐藏充值按钮">
@@ -57,6 +57,7 @@ export default {
         api_url: '',
         uni_site_url: '',
         admin_api_url: '',
+        start_delivery_count: '',
         store_free_postage: ''
       },
       rules: {

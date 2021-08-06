@@ -74,7 +74,7 @@ export default {
         ['砍价专区', '/pages/activity/GoodsBargain/index'],
         ['秒杀专区', '/pages/activity/GoodsSeckill/index'],
         ['满减专区', '/pages/activity/fullReduction/list'],
-        ['积分商城', '/pages/shop/GoodsList/index?title=积分商城&isIntegral=true&?type=0']],
+        ['积分商城', '/pages/shop/GoodsList/index?title=积分商城&isIntegral=true&type=0']],
       rules: {
 
       }
