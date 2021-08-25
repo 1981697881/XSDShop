@@ -8,7 +8,7 @@ import errorCode from '@/utils/errorCode'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: (process.env.NODE_ENV === 'production'?'https://gzfzdev.com':'') + process.env.VUE_APP_BASE_API, // api 的 base_url
+  baseURL: (process.env.NODE_ENV === 'production'?'http://xsd.gzfzdev.com:50025':'') + process.env.VUE_APP_BASE_API, // api 的 base_url
   // baseURL: process.env.VUE_APP_ENV_URL,
   withCredentials: true, // send cookies when cross-domain requests
   timeout: Config.timeout // 请求超时时间

@@ -1,4 +1,4 @@
-const baseUrl = (process.env.NODE_ENV === 'production'?'https://gzfzdev.com':'') + process.env.VUE_APP_BASE_API
+const baseUrl = (process.env.NODE_ENV === 'production'?'http://xsd.gzfzdev.com:50025':'') + process.env.VUE_APP_BASE_API
 
 const api = {
   state: {

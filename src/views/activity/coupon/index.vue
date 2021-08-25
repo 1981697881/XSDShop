@@ -22,6 +22,14 @@
     <el-table v-loading="loading" :data="data" size="small" style="width: 100%;">
       <!--<el-table-column prop="id" label="ID"/>-->
       <el-table-column prop="title" label="优惠券名称"/>
+      <el-table-column label="优惠券类别" align="center">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.orderType === 1" style="cursor: pointer" :type="'warning'">积分商品</el-tag>
+          <el-tag v-else-if="scope.row.orderType === 2" style="cursor: pointer" :type="'warning'">预售商品</el-tag>
+          <el-tag v-else-if="scope.row.orderType === 3" style="cursor: pointer" :type="'warning'">极速达商品</el-tag>
+          <el-tag v-else style="cursor: pointer" :type=" 'info' ">普通商品</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="type" label="优惠券类型">
         <template slot-scope="scope">
           <div>
@@ -240,7 +248,7 @@
         form.uid = that.checkData.uid
         if(that.checkData.uid){
           couponIssueGetLimit(form).then(res => {
-            that.creatQrCode('qrCode', res+"?pageType=coupon")
+            that.creatQrCode('qrCode', "https://xsd.gzfzdev.com?pageType=coupon&code="+res)
             this.$notify({
               title: '生成成功',
               type: 'success',

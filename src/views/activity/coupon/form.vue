@@ -1,6 +1,14 @@
 <template>
   <el-dialog :append-to-body="true" :close-on-click-modal="false" :before-close="cancel" :visible.sync="dialog" :title="isAdd ? '新增' : '编辑'" width="800px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="140px">
+      <el-form-item label="优惠券分类">
+        <el-radio-group v-model="form.orderType" @change="couponsOrderType">
+          <el-radio :label=0>普通商品</el-radio>
+          <el-radio :label=1>积分商品</el-radio>
+          <el-radio :label=2>预售商品</el-radio>
+          <el-radio :label=3>极速达商品</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item label="优惠券类型">
         <el-radio-group v-model="form.type" @change="couponsType">
           <el-radio :label=0>通用券</el-radio>
@@ -9,7 +17,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="选择商品" v-if="form.type == 1">
-        <cgood v-model="form.product" @selectGoods="getGoods"></cgood>
+        <cgood v-model="form.product" ref="cgood" :orderType="form.orderType" @selectGoods="getGoods"></cgood>
       </el-form-item>
       <el-form-item label="优惠券名称">
         <el-input v-model="form.title" style="width: 300px;" />
@@ -75,6 +83,7 @@ export default {
         sort: 0,
         status: 1,
         type: 0,
+        orderType: 0,
         productId: '',
         product: []
       },
@@ -91,6 +100,10 @@ export default {
       this.form.productId = ids.join(",")
     },
     couponsType() {
+      //alert(this.form.type)
+    },
+    couponsOrderType() {
+      this.$refs.cgood.init();
       //alert(this.form.type)
     },
     cancel() {
@@ -146,6 +159,7 @@ export default {
         sort: 0,
         status: 1,
         type: 0,
+        orderType: 0,
         productId: '',
         product: []
       }

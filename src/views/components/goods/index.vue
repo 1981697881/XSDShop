@@ -80,6 +80,11 @@ export default {
       default() {
         return []
       }
+    }, orderType: {
+      type: [String,Number],
+      default() {
+        return 0
+      }
     },
     // 宽度
     width: {
@@ -177,11 +182,11 @@ export default {
     toSelete() {
       this.dialog = true
     },
-    checkPermission,
     beforeInit() {
+      console.log(123313)
       this.url = 'mall/yxStoreProduct'
       const sort = 'id,desc'
-      this.params = {page: this.page, size: this.size, sort: sort, isShow: 1, isDel: 0} /*isIntegral:0*/
+      this.params = {page: this.page, size: this.size, sort: sort, isShow: 1, isDel: 0,isIntegral:this.orderType} /*isIntegral:0*/
       const query = this.query
       const type = query.type
       const value = query.value
