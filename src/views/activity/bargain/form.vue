@@ -1,9 +1,19 @@
 <template>
   <el-dialog :append-to-body="true" :close-on-click-modal="false" :before-close="cancel" :visible.sync="dialog" :title="isAdd ? '新增' : '开启砍价'" width="900px">
     <el-form ref="form" :model="form" :rules="rules" :inline="true" size="small" label-width="140px">
+      <!--<el-col :span="24">
+        <el-form-item label="商品分类">
+          <el-radio-group v-model="form.orderType" @change="couponsOrderType">
+            <el-radio :label=0>普通商品</el-radio>
+            &lt;!&ndash; <el-radio :label=1>积分商品</el-radio>&ndash;&gt;
+            <el-radio :label=2>预售商品</el-radio>
+            &lt;!&ndash; <el-radio :label=3>极速达商品</el-radio>&ndash;&gt;
+          </el-radio-group>
+        </el-form-item>
+      </el-col>-->
       <el-col :span="24">
         <el-form-item label="选择商品：" prop="good">
-          <cgood v-model="form1.good":disabled="true" ></cgood>
+          <cgood v-model="form1.good" ref="cgood" :isIntegral="form.orderType" :disabled="true" ></cgood>
         </el-form-item>
       </el-col>
       <el-form-item label="砍价名称">
@@ -123,6 +133,7 @@ export default {
       form: {
         id: '',
         productId: '',
+        orderType: 0,
         title: '',
         image: '',
         unitName: '',
@@ -181,6 +192,9 @@ export default {
     },
   },
   methods: {
+    couponsOrderType() {
+      this.$refs.cgood.init();
+    },
     // 详情选择商品生成规格用
     getInfoChooseGood (id) {
       let that = this;

@@ -77,7 +77,13 @@ export default {
   props: {
     value: {
       type: Object
-    }
+    },
+    isIntegral: {
+      type: [String,Number],
+      default() {
+        return 0
+      }
+    },
   },
   data() {
     return {
@@ -99,7 +105,7 @@ export default {
     beforeInit() {
       this.url = 'mall/yxStoreProduct'
       const sort = 'id,desc'
-      this.params = { page: this.page, size: this.size, sort: sort, isShow: 1, isDel: 0 ,isIntegral:0}
+      this.params = { page: this.page, size: this.size, sort: sort, isShow: 1, isDel: 0 ,isIntegral:this.isIntegral}
       const query = this.query
       const type = query.type
       const value = query.value
