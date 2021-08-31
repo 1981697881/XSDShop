@@ -31,7 +31,7 @@
 
         <el-table-column prop="storeName" width="172mm" label="商品名称" />
 
-        <el-table-column prop="unitName" width="80mm" label="商品规格" />
+        <el-table-column prop="sku" width="80mm" label="商品规格" />
 
         <el-table-column prop="unitName" width="80mm" label="单位" />
 
@@ -101,7 +101,7 @@ export default {
           sums[index] = '合计';
           return;
         }else if(index === 7){
-          const values = data.map(item => Number(item.price*item.cartNum));
+          const values = data.map(item => Number(item.price*item.putCount));
           sums[index] = values.reduce((prev, curr) => {
             const value = Number(curr);
             if (!isNaN(value)) {
