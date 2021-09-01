@@ -25,6 +25,8 @@
         <el-table-column prop="allCount" label="商品总数"/>
         <el-table-column prop="putCount" label="派送数量"/>
         <el-table-column prop="putDate" label="派送日期"/>
+        <el-table-column prop="sku" label="商品规格"/>
+        <el-table-column prop="unitName" label="单位"/>
         <el-table-column prop="realName" label="用户"/>
         <el-table-column prop="userPhone" label="用户手机"/>
       </el-table>

@@ -11,40 +11,29 @@
 
     <div id="printList">
       <div class="order-list" v-for="(list, index) in printList">
-      <el-header class="order-title">订货单</el-header>
-
-      <div class="order-info">
-        <span class="info">{{list.orderId}}</span>
-        <span class="info">下单日期 : {{formatTimeTwo(list.addTime)}}</span>
-        <span>客户名称 : {{list.realName}}</span>
-      </div>
-      <div class="order-info">
-        <span class="info">联系人 : {{list.userDTO.account}}</span>
-        <span class="info">联系电话 : {{list.userPhone}}</span>
-        <span>收货地址 : {{list.userAddress}}</span>
-      </div>
-
-      <el-table border show-summary :data="list.cartInfoList"  :summary-method="getSummaries" size="small" style="width: 100%;">
+      <el-header class="order-title">心水达商城购，批发价送到家</el-header>
+        <div class="order-info">
+          下单日期: {{formatTimeTwo(list.addTime)}}
+        </div>
+        <div class="order-info">
+          订单号: {{list.orderId}}
+        </div>
+        <div class="order-info">
+          姓名: {{list.realName}}
+        </div>
+        <div class="order-info">
+          电话: {{list.userPhone}}
+        </div>
+        <div class="order-info">
+          地址: {{list.userAddress}}
+        </div>
+      <el-table border show-summary :data="list.cartInfoList" :summary-method="getSummaries" size="small" style="width: 100%;">
         <el-table-column type="index" label="行号" :index="indexMethod" width="60mm"/>
-
-        <el-table-column prop="cartInfoMap.productInfo.productId" width="80mm" label="商品编号" />
-
-        <el-table-column prop="cartInfoMap.productInfo.storeName" width="172mm" label="商品名称" />
-
-        <el-table-column prop="cartInfoMap.productInfo.unitName" width="80mm" label="商品规格" />
-
-        <el-table-column prop="cartInfoMap.productInfo.unitName" width="80mm" label="单位" />
-
-        <el-table-column prop="cartInfoMap.productInfo.price" width="80mm" label="单价" />
-
-        <el-table-column prop="cartInfoMap.cartNum" width="80mm" label="数量" />
-
-        <el-table-column prop="cartInfoMap" width="80mm" label="小计(元)" >
+        <el-table-column prop="cartInfoMap.productInfo.productId" label="商品">
           <template slot-scope="scope">
-            <span>{{ scope.row.cartInfoMap.productInfo.price*scope.row.cartInfoMap.cartNum }}</span>
+            <span>{{ scope.row.cartInfoMap.productInfo.storeName}} / {{ scope.row.cartInfoMap.productInfo.attrInfo.sku}} / {{ scope.row.cartInfoMap.cartNum}} </span>
           </template>
         </el-table-column>
-
         <el-table-column prop="cartInfoMap.mark" width="80mm" label="备注" />
 
       </el-table>
@@ -100,8 +89,8 @@ export default {
         if (index === 0) {
           sums[index] = '合计';
           return;
-        }else if(index === 7){
-          const values = data.map(item => Number(item.cartInfoMap.productInfo.price*item.cartInfoMap.cartNum));
+        }else if(index === 1){
+          const values = data.map(item => Number(item.cartInfoMap.cartNum));
           sums[index] = values.reduce((prev, curr) => {
             const value = Number(curr);
             if (!isNaN(value)) {
@@ -110,7 +99,8 @@ export default {
               return prev;
             }
           }, 0);
-          sums[index] += ' 元';
+          /*sums[index] += ' 元';*/
+          sums[index] += ' ';
         }
       });
       return sums;
@@ -173,6 +163,7 @@ export default {
       text-align: center;
     }
     .order-info {
+      padding: 10px;
       span {
         display: inline-block;
         padding: 0 0 10px 0;

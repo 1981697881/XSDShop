@@ -619,6 +619,7 @@
         this.list = []
         this.planProductId = row.cartInfoMap.productId
         this.cartNum = row.cartInfoMap.cartNum
+        this.productAttrUnique = row.cartInfoMap.productAttrUnique
         console.log(row)
         getPSPlan({productId: row.cartInfoMap.productId, orderId: this.order.orderId}).then(res => {
           if (res.length > 0) {
@@ -629,6 +630,7 @@
       },
       saveStart() {
         this.list[0].allCount = this.cartNum
+
         addPSPlan(this.list).then(res => {
           if(res.success){
             this.$message({
@@ -703,7 +705,7 @@
           if (i.isSet) return this.$message.warning("请先保存当前编辑项");
         }
         this.cIndex += 1
-        let j = {isSet: true, cIndex: this.cIndex, orderId: this.order.orderId, productId: this.planProductId};
+        let j = {isSet: true, cIndex: this.cIndex, orderId: this.order.orderId, productId: this.planProductId, arrUnique: this.productAttrUnique};
         console.log(j)
         this.list.push(j);
         this.sel = JSON.parse(JSON.stringify(j));
