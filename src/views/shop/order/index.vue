@@ -134,7 +134,7 @@
             <span>{{ formatTime(scope.row.createTime) }}</span>
           </template>
         </el-table-column>
-          <el-table-column v-if="checkPermission(['admin','YXSTOREORDER_ALL','YXSTOREORDER_EDIT','YXSTOREORDER_DELETE'])"
+        <el-table-column v-if="checkPermission(['admin','YXSTOREORDER_ALL','YXSTOREORDER_EDIT','YXSTOREORDER_DELETE'])"
                          label="操作" width="200" align="center" fixed="right">
           <template slot-scope="scope">
             <el-button
@@ -701,7 +701,26 @@
         };
       },
       handleSelectionChange(val) {
-        this.checkList = val;
+        let printList = []
+        if (val.length > 0) {
+          val.forEach((item, index) => {
+            let result = []
+            for (let i = 0; i < Math.ceil(item.cartInfoList.length / 5); i++) {
+              let obj = {...item}
+              obj.cartInfoList = []
+              item.cartInfoList.forEach((cart, cartIndex) => {
+                if(Math.ceil((cartIndex+1)/ 5)<=i+1){
+                  if (result.indexOf(cartIndex) == -1) {
+                    result.push(cartIndex)
+                    obj.cartInfoList.push(cart)
+                  }
+                }
+              })
+              printList.push(obj)
+            }
+          })
+        }
+        this.checkList = printList;
         let orderPrice = 0, storeNum = 0, orderNum = 0, userNum = 0;
         if (val.length != 0) {
           this.printChecked = true;

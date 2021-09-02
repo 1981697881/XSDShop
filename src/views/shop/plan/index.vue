@@ -139,23 +139,9 @@
       },
       handleSelectionChange(val) {
         this.checkList = val;
-        let orderPrice = 0, storeNum = 0, orderNum = 0, userNum = 0;
+        console.log(val)
         if (val.length != 0) {
           this.printChecked = true;
-          let user = [];
-          val.forEach((item, index) => {
-            orderNum += 1;
-            orderPrice += item.totalPrice;
-            storeNum += item.totalNum;
-            user.push(item.userDTO.nickname);
-          })
-          user = Array.from(new Set(user));
-          this.caculateInfo = {
-            orderPrice: orderPrice.toFixed(2),
-            storeNum: storeNum,
-            orderNum: orderNum,
-            userNum: user.length,
-          };
         } else {
           this.printChecked = false;
           this.clearCaculateInfo();
